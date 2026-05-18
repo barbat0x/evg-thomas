@@ -1,0 +1,66 @@
+<div
+  class="play-column play-column--{{ side }}{% if current_team and current_team.pk == team.pk %} play-column--active-turn{% endif %}"
+  {% if current_team and current_team.pk == team.pk %}aria-current="true"{% endif %}
+>
+  <div class="play-column-progress" role="status">
+    {% if play_no_questions %}
+      <p class="play-column-progress__main">—</p>
+    {% elif play_finished %}
+      {% if side == 'a' %}
+        <p class="play-column-progress__main">{{ play_team_a_turns_answered }}/{{ play_team_a_turns_total }}</p>
+      {% else %}
+        <p class="play-column-progress__main">{{ play_team_b_turns_answered }}/{{ play_team_b_turns_total }}</p>
+      {% endif %}
+      <p class="play-column-progress__sub">Manche terminée</p>
+    {% else %}
+      <p class="play-column-progress__main">Question {{ question_number }} / {{ question_total }}</p>
+      <p class="play-column-progress__sub">
+        {% if side == 'a' %}
+          {% if play_team_a_turns_answered == 1 %}
+            1 tour joué
+          {% elif play_team_a_turns_answered == 0 %}
+            Aucun tour joué
+          {% else %}
+            {{ play_team_a_turns_answered }} tours joués
+          {% endif %}
+          ·
+          {% if play_team_a_turns_left == 1 %}
+            1 à venir pour vous
+          {% elif play_team_a_turns_left == 0 %}
+            Aucun à venir pour vous
+          {% else %}
+            {{ play_team_a_turns_left }} à venir pour vous
+          {% endif %}
+        {% else %}
+          {% if play_team_b_turns_answered == 1 %}
+            1 tour joué
+          {% elif play_team_b_turns_answered == 0 %}
+            Aucun tour joué
+          {% else %}
+            {{ play_team_b_turns_answered }} tours joués
+          {% endif %}
+          ·
+          {% if play_team_b_turns_left == 1 %}
+            1 à venir pour vous
+          {% elif play_team_b_turns_left == 0 %}
+            Aucun à venir pour vous
+          {% else %}
+            {{ play_team_b_turns_left }} à venir pour vous
+          {% endif %}
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+  {% if current_team and current_team.pk == team.pk %}
+    <p class="play-column-turn-badge{% if side == 'b' %} play-column-turn-badge--b{% endif %}" aria-hidden="true">À vous !</p>
+  {% endif %}
+  <div class="play-column__row">
+    {% if side == 'a' %}
+      {% include 'myapp/_play_team_drink_side.html' with side=side %}
+    {% endif %}
+    {% include 'myapp/_play_team_aside.html' %}
+    {% if side == 'b' %}
+      {% include 'myapp/_play_team_drink_side.html' with side=side %}
+    {% endif %}
+  </div>
+</div>

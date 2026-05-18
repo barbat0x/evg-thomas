@@ -1,0 +1,170 @@
+{% if messages %}
+  <ul class="play-messages">
+    {% for message in messages %}
+    <li class="play-msg play-msg-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<script type="application/json" id="play-drink-snapshot">{"a_g":{{ drink_team_a_gorgees }},"a_s":{{ drink_team_a_shots }},"b_g":{{ drink_team_b_gorgees }},"b_s":{{ drink_team_b_shots }},"t_g":{{ drink_thomas_gorgees }},"t_s":{{ drink_thomas_shots }}}</script>
+
+<div class="play-shell {% if play_no_questions %}play-shell--no-questions{% endif %}">
+    <aside class="play-modes-legend" aria-label="Points par mode de réponse">
+      <span class="play-modes-legend__item"><strong>Duo</strong> 1 pt</span>
+      <span class="play-modes-legend__sep" aria-hidden="true">·</span>
+      <span class="play-modes-legend__item"><strong>Carré</strong> 2 pts</span>
+      <span class="play-modes-legend__sep" aria-hidden="true">·</span>
+      <span class="play-modes-legend__item"><strong>Cash</strong> 4 pts</span>
+    </aside>
+    <div
+      class="play-thomas-strip"
+      role="group"
+      aria-label="Thomas : {% if drink_thomas_gorgees == 1 %}1 gorgée{% elif drink_thomas_gorgees > 0 %}{{ drink_thomas_gorgees }} gorgées{% else %}0 gorgées{% endif %}, {% if drink_thomas_shots == 1 %}1 shot{% elif drink_thomas_shots > 0 %}{{ drink_thomas_shots }} shots{% else %}0 shot{% endif %}">
+      <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--thomas play-drink-metric--td-{% if drink_thomas_gorgees < 10 %}1{% elif drink_thomas_gorgees < 100 %}2{% elif drink_thomas_gorgees < 1000 %}3{% else %}4{% endif %}" data-drink-metric="t-g">
+        <img
+          class="play-drink-metric__icon"
+          src="{{ MEDIA_URL }}cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ drink_thomas_gorgees }}</span>
+          <span class="play-drink-metric__lbl">{% if drink_thomas_gorgees == 1 %}gorgée{% else %}gorgées{% endif %}</span>
+        </div>
+      </div>
+      <div class="play-top-photo play-top-photo--face-mask" aria-hidden="true" style="--play-face-mask: url('{{ MEDIA_URL }}thomas.png')">
+        <img
+          class="play-top-photo__img"
+          src="{{ MEDIA_URL }}thomas.png"
+          alt=""
+          decoding="async">
+      </div>
+      <div class="play-drink-metric play-drink-metric--shots play-drink-metric--thomas play-drink-metric--td-{% if drink_thomas_shots < 10 %}1{% elif drink_thomas_shots < 100 %}2{% elif drink_thomas_shots < 1000 %}3{% else %}4{% endif %}" data-drink-metric="t-s">
+        <img
+          class="play-drink-metric__icon play-drink-metric__icon--fire"
+          src="{{ MEDIA_URL }}fire-cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ drink_thomas_shots }}</span>
+          <span class="play-drink-metric__lbl">{% if drink_thomas_shots == 1 %}shot{% else %}shots{% endif %}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="play-stage">
+  <div class="play-layout">
+    {% include 'myapp/_play_team_column.html' with team=game.team_a side='a' %}
+
+    {% if play_no_questions %}
+    <main class="play-center">
+      <p class="play-empty">Aucune question en base. Ajoutez des questions dans l’admin Django.</p>
+    </main>
+    {% elif play_finished %}
+    <main class="play-center play-center--centered">
+      <h1 class="play-title">Manche terminée</h1>
+      {% if play_message %}<p class="play-lead">{{ play_message }}</p>{% endif %}
+      <p class="play-result">
+        <strong>{{ game.team_a.name }}</strong> — {{ score_a_total }} pts
+        ·
+        <strong>{{ game.team_b.name }}</strong> — {{ score_b_total }} pts
+      </p>
+      <div class="play-drink-summary">
+        <h2 class="play-drink-summary__title">À boire</h2>
+        <ul class="play-drink-summary__list">
+          <li>
+            <strong>{{ game.team_a.name }}</strong> —
+            {% if drink_team_a_gorgees or drink_team_a_shots %}
+              {% if drink_team_a_gorgees %}{% if drink_team_a_gorgees == 1 %}1 gorgée{% else %}{{ drink_team_a_gorgees }} gorgées{% endif %}{% endif %}
+              {% if drink_team_a_gorgees and drink_team_a_shots %} · {% endif %}
+              {% if drink_team_a_shots %}{% if drink_team_a_shots == 1 %}1 shot{% else %}{{ drink_team_a_shots }} shots{% endif %}{% endif %}
+            {% else %}
+              rien
+            {% endif %}
+          </li>
+          <li>
+            <strong>{{ game.team_b.name }}</strong> —
+            {% if drink_team_b_gorgees or drink_team_b_shots %}
+              {% if drink_team_b_gorgees %}{% if drink_team_b_gorgees == 1 %}1 gorgée{% else %}{{ drink_team_b_gorgees }} gorgées{% endif %}{% endif %}
+              {% if drink_team_b_gorgees and drink_team_b_shots %} · {% endif %}
+              {% if drink_team_b_shots %}{% if drink_team_b_shots == 1 %}1 shot{% else %}{{ drink_team_b_shots }} shots{% endif %}{% endif %}
+            {% else %}
+              rien
+            {% endif %}
+          </li>
+          <li>
+            <strong>Thomas</strong> —
+            {% if drink_thomas_gorgees or drink_thomas_shots %}
+              {% if drink_thomas_gorgees %}{% if drink_thomas_gorgees == 1 %}1 gorgée{% else %}{{ drink_thomas_gorgees }} gorgées{% endif %}{% endif %}
+              {% if drink_thomas_gorgees and drink_thomas_shots %} · {% endif %}
+              {% if drink_thomas_shots %}{% if drink_thomas_shots == 1 %}1 shot{% else %}{{ drink_thomas_shots }} shots{% endif %}{% endif %}
+            {% else %}
+              rien
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </main>
+    {% else %}
+    <main class="play-center">
+      <p class="play-turn">Répond : <strong>{{ current_team.name }}</strong></p>
+
+      <h1 class="play-question">{{ question.text }}</h1>
+
+      {% if not mode %}
+      <p class="play-hint">Choisissez le mode de réponse :</p>
+      <div class="play-modes">
+        <form method="post" class="play-mode-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="choose_mode">
+          <input type="hidden" name="mode" value="duo">
+          <button type="submit" class="play-btn play-btn-mode">Duo</button>
+        </form>
+        <form method="post" class="play-mode-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="choose_mode">
+          <input type="hidden" name="mode" value="carre">
+          <button type="submit" class="play-btn play-btn-mode">Carré</button>
+        </form>
+        <form method="post" class="play-mode-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="choose_mode">
+          <input type="hidden" name="mode" value="cash">
+          <button type="submit" class="play-btn play-btn-mode">Cash</button>
+        </form>
+      </div>
+      {% else %}
+      {% if mode == 'cash' %}
+      <div class="play-cash-panel">
+      <form method="post" class="play-cash-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="answer">
+        <div class="play-cash-verdict">
+          <button type="submit" name="cash_verdict" value="correct" class="play-btn play-btn-cash-true">Vrai</button>
+          <button type="submit" name="cash_verdict" value="wrong" class="play-btn play-btn-cash-false">Faux</button>
+        </div>
+      </form>
+      </div>
+      {% else %}
+      <div class="play-choices play-choices--{{ mode }}">
+        {% for row in choice_rows %}
+        <form method="post" class="play-choice-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="answer">
+          <input type="hidden" name="choice_index" value="{{ row.index }}">
+          <button type="submit" class="play-btn play-btn-choice">{{ row.text }}</button>
+        </form>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endif %}
+    </main>
+    {% endif %}
+
+    {% include 'myapp/_play_team_column.html' with team=game.team_b side='b' %}
+  </div>
+    </div>
+</div>

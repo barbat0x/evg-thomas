@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Membres — {{ team.name }} — quiz</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myapp/css/setup.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">Membres de l’équipe</h1>
+      <nav class="header-actions" aria-label="Navigation">
+        <span class="user-label">{{ user.get_username }}</span>
+        <a href="{% url 'admin:index' %}" class="link-muted">Admin Django</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="back-row"><a href="{% url 'setup' %}" class="link-muted">← Retour à la préparation</a></p>
+
+    {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}
+      <li class="message message-{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <section class="card" aria-labelledby="h-members">
+      <h2 id="h-members">{{ team.name }}</h2>
+      <p class="lead">Ajoutez des participants, retirez-les ou changez leur ordre dans l’équipe.</p>
+
+      {% if memberships %}
+      <ol class="membership-list">
+        {% for m in memberships %}
+        <li class="membership-row">
+          <div class="membership-main">
+            {% if m.participant.photo %}
+            <img src="{{ m.participant.photo.url }}" alt="" class="participant-avatar{% if m.participant.name == 'Julien B' %} participant-avatar--julien-b{% endif %}" width="36" height="36" loading="lazy">
+            {% else %}
+            <span class="participant-avatar participant-avatar--placeholder{% if m.participant.name == 'Julien B' %} participant-avatar--julien-b{% endif %}" aria-hidden="true"></span>
+            {% endif %}
+            <span class="membership-name">{{ m.participant.name }}</span>
+          </div>
+          <div class="membership-actions">
+            <a href="{% url 'edit_participant' m.participant_id %}" class="btn small secondary">Profil</a>
+            {% if not forloop.first %}
+            <form method="post" class="inline-form">{% csrf_token %}
+              <input type="hidden" name="action" value="move_up">
+              <input type="hidden" name="membership_id" value="{{ m.pk }}">
+              <button type="submit" class="btn small secondary">Monter</button>
+            </form>
+            {% endif %}
+            {% if not forloop.last %}
+            <form method="post" class="inline-form">{% csrf_token %}
+              <input type="hidden" name="action" value="move_down">
+              <input type="hidden" name="membership_id" value="{{ m.pk }}">
+              <button type="submit" class="btn small secondary">Descendre</button>
+            </form>
+            {% endif %}
+            <form method="post" class="inline-form" onsubmit="return confirm('Retirer ce participant de l’équipe ?');">{% csrf_token %}
+              <input type="hidden" name="action" value="remove_member">
+              <input type="hidden" name="membership_id" value="{{ m.pk }}">
+              <button type="submit" class="btn small secondary">Retirer</button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="muted">Aucun membre pour l’instant.</p>
+      {% endif %}
+
+      <h3 class="subsection-title">Ajouter un participant</h3>
+      {% if can_add_member %}
+      <form method="post" class="stack">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_member">
+        <div class="field-row">
+          {{ add_form.participant.label_tag }}
+          {{ add_form.participant }}
+          {% if add_form.participant.errors %}<p class="error">{{ add_form.participant.errors }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn primary">Ajouter à cette équipe</button>
+      </form>
+      {% else %}
+      <p class="muted">Tous les participants sont déjà dans cette équipe (ou aucun participant en base).</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

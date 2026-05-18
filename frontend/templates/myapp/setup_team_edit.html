@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modifier une équipe — quiz</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myapp/css/setup.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">Modifier l’équipe</h1>
+      <nav class="header-actions" aria-label="Navigation">
+        <span class="user-label">{{ user.get_username }}</span>
+        <a href="{% url 'admin:index' %}" class="link-muted">Admin Django</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="back-row"><a href="{% url 'setup' %}" class="link-muted">← Retour à la préparation</a></p>
+
+    {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}
+      <li class="message message-{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <section class="card" aria-labelledby="h-edit-t">
+      <h2 id="h-edit-t">{{ team.name }}</h2>
+      <p class="lead">Modifiez le nom de l’équipe. Les membres se gèrent depuis la page principale.</p>
+
+      <form method="post" class="stack">
+        {% csrf_token %}
+        <div class="field-row">
+          {{ form.name.label_tag }}
+          {{ form.name }}
+          {% if form.name.errors %}<p class="error">{{ form.name.errors }}</p>{% endif %}
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary">Enregistrer</button>
+          <a href="{% url 'setup' %}" class="btn secondary">Annuler</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

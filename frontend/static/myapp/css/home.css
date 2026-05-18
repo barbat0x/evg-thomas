@@ -1,0 +1,303 @@
+:root {
+  --home-bg: #c8e7fc;
+  --home-bg-deep: #a8d8f5;
+  --home-text: #0d3a5c;
+  --home-cta-text: #ffffff;
+  --home-zone-a: #4da3ff;
+  --home-zone-b: #5ce1c5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.home-body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Ubuntu,
+    sans-serif;
+  color: var(--home-text);
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 20%,
+    #dff2ff 0%,
+    var(--home-bg) 42%,
+    var(--home-bg-deep) 100%
+  );
+  overflow-x: hidden;
+}
+
+/* Portrait central ; sous le champ d’orbite, le titre et le CTA (z-index plus hauts). */
+.home-center-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Sans largeur explicite, le navigateur garde la taille intrinsèque du PNG ;
+   max-width ne plafonne que si l’intrinsèque dépasse. Ici on impose la largeur. */
+.home-center-photo__img {
+  display: block;
+  flex-shrink: 0;
+  width: min(50vw, 60rem);
+  height: auto;
+  max-height: min(100dvh, 75rem);
+  object-fit: contain;
+  user-select: none;
+  transform-origin: center center;
+  transition: transform var(--home-pool-tilt-duration, 1s) ease-in-out;
+  will-change: transform;
+}
+
+.home-center-photo__img--tilt-left {
+  transform: rotate(-30deg);
+}
+
+.home-center-photo__img--tilt-right {
+  transform: rotate(30deg);
+}
+
+/* Calque plein écran ; positions des étoiles gérées en JS (sin/cos). */
+.home-orbit-field {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.home-star-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  margin: 0;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 2px rgba(13, 58, 92, 0.18));
+  object-fit: contain;
+  will-change: left, top;
+}
+
+.home-orbit-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  margin: 0;
+  opacity: 0.8;
+  filter: drop-shadow(0 2px 4px rgba(13, 58, 92, 0.18));
+  object-fit: contain;
+  will-change: left, top;
+}
+
+.home-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  width: 100%;
+  max-width: none;
+  padding: clamp(1.5rem, 5vw, 3rem) 1.25rem 1rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.home-title {
+  margin: 0 auto;
+  max-width: 52rem;
+  pointer-events: auto;
+  font-size: clamp(1.65rem, 6.5vw, 3.35rem);
+  font-weight: 850;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65),
+    0 3px 24px rgba(255, 255, 255, 0.45);
+}
+
+.home-main {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1.5rem 1.25rem;
+  pointer-events: none;
+}
+
+.home-cta {
+  position: relative;
+  z-index: 6;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.45rem, 2vw, 0.85rem);
+  margin: 0;
+  padding: clamp(0.95rem, 3.2vw, 1.35rem) clamp(1.5rem, 5vw, 2.5rem);
+  font-size: clamp(1.15rem, 4.2vw, 1.85rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-decoration: none;
+  text-align: center;
+  color: var(--home-cta-text);
+  border-radius: 999px;
+  border: 3px dashed rgba(255, 255, 255, 0.65);
+  background: linear-gradient(
+    132deg,
+    var(--home-zone-a) 0%,
+    #1976d2 42%,
+    #1289c4 58%,
+    var(--home-zone-b) 100%
+  );
+  background-size: 220% 220%;
+  box-shadow:
+    0 0 0 4px rgba(13, 58, 92, 0.1),
+    10px 12px 0 rgba(77, 163, 255, 0.4),
+    -8px 14px 0 rgba(92, 225, 197, 0.32),
+    0 18px 48px rgba(13, 71, 161, 0.38),
+    0 3px 0 rgba(255, 255, 255, 0.38) inset;
+  text-shadow:
+    0 2px 0 rgba(13, 58, 92, 0.22),
+    0 0 28px rgba(255, 255, 255, 0.35);
+  transform: rotate(-1.2deg) scale(1);
+  opacity: 0.38;
+  animation:
+    home-cta-wiggle 5s ease-in-out infinite,
+    home-cta-shimmer 8s ease infinite;
+  transition:
+    opacity 0.28s ease,
+    transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+@keyframes home-cta-wiggle {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) scale(1);
+  }
+
+  20% {
+    transform: rotate(0.9deg) scale(1.03);
+  }
+
+  40% {
+    transform: rotate(-0.4deg) scale(1.01);
+  }
+
+  60% {
+    transform: rotate(1deg) scale(1.02);
+  }
+
+  80% {
+    transform: rotate(-0.7deg) scale(1);
+  }
+}
+
+@keyframes home-cta-shimmer {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+.home-cta__label {
+  display: inline-block;
+}
+
+.home-cta__star {
+  font-size: 0.55em;
+  line-height: 1;
+  opacity: 0.95;
+  animation: home-cta-star 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgba(13, 58, 92, 0.25));
+}
+
+.home-cta__star--l {
+  animation-delay: 0s;
+}
+
+.home-cta__star--r {
+  animation-delay: 0.35s;
+}
+
+@keyframes home-cta-star {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: scale(1.35) rotate(18deg);
+    opacity: 1;
+  }
+}
+
+.home-cta:hover,
+.home-cta:focus-visible {
+  animation: none;
+  opacity: 1;
+  filter: brightness(1.09) saturate(1.08);
+  transform: rotate(0deg) scale(1.08);
+  box-shadow:
+    0 0 0 4px rgba(13, 58, 92, 0.12),
+    12px 14px 0 rgba(77, 163, 255, 0.42),
+    -10px 16px 0 rgba(92, 225, 197, 0.36),
+    0 22px 56px rgba(13, 71, 161, 0.42),
+    0 3px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.home-cta:active {
+  opacity: 1;
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 3px rgba(13, 58, 92, 0.1),
+    4px 5px 0 rgba(77, 163, 255, 0.35),
+    -3px 6px 0 rgba(92, 225, 197, 0.3),
+    0 10px 28px rgba(13, 71, 161, 0.3),
+    0 2px 0 rgba(255, 255, 255, 0.35) inset;
+}
+
+.home-cta:focus-visible {
+  outline: 3px solid var(--home-zone-b);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cta,
+  .home-cta__star {
+    animation: none !important;
+  }
+
+  .home-cta {
+    transform: none;
+    opacity: 1;
+  }
+
+  .home-center-photo__img {
+    transition: none !important;
+    transform: none !important;
+  }
+}

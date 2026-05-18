@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{{ play_document_title }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myapp/css/play.css' %}">
+</head>
+<body class="play-body">
+  <div id="play-live" data-play-enhanced="1">
+  {% include 'myapp/_play_live.html' %}
+  </div>
+  <script src="{% static 'myapp/js/play-team-tilt.js' %}" defer></script>
+  <script src="{% static 'myapp/js/play-drink-animate.js' %}" defer></script>
+  <script src="{% static 'myapp/js/play-async.js' %}" defer></script>
+</body>
+</html>

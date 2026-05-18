@@ -1,0 +1,31 @@
+<div
+  class="compose-card{% if p.name == 'Julien B' %} compose-card--julien-b{% endif %}"
+  draggable="false"
+  data-participant-id="{{ p.pk }}"
+>
+  {% if p.photo %}
+  <img
+    class="compose-card-photo"
+    src="{{ p.photo.url }}"
+    alt=""
+    width="{% if p.name == 'Julien B' %}202{% else %}176{% endif %}"
+    height="{% if p.name == 'Julien B' %}202{% else %}176{% endif %}"
+    draggable="false"
+    loading="lazy"
+    decoding="async"
+  >
+  {% else %}
+  <span class="compose-card-photo compose-card-photo--placeholder" aria-hidden="true"></span>
+  {% endif %}
+  <label class="compose-card-label" for="participant-name-{{ p.pk }}">Nom</label>
+  <input
+    type="text"
+    class="compose-card-name"
+    id="participant-name-{{ p.pk }}"
+    name="participant_name_{{ p.pk }}"
+    value="{{ p.name }}"
+    required
+    maxlength="200"
+    autocomplete="name"
+  >
+</div>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Créer les équipes — partie {{ game.pk }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myapp/css/game-compose.css' %}">
+</head>
+<body class="compose-body">
+  <header class="compose-header">
+    <a href="{% url 'setup' %}" class="compose-back">← Préparation</a>
+    <h1 class="compose-title">Créer les deux équipes de troubadour</h1>
+  </header>
+
+  {% if messages %}
+  <ul class="compose-messages" role="status">
+    {% for message in messages %}
+    <li class="compose-msg compose-msg--{{ message.level_tag }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if not has_participants %}
+  <p class="compose-empty">Aucun participant en base : créez-en depuis la <a href="{% url 'setup' %}">préparation</a>.</p>
+  {% else %}
+  <form
+    class="compose-form"
+    method="post"
+    id="compose-form"
+    data-compose-form
+  >
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_and_start">
+    <input type="hidden" name="team_a_order" id="team-a-order" value="">
+    <input type="hidden" name="team_b_order" id="team-b-order" value="">
+
+    <div class="compose-layout">
+      <aside class="compose-side compose-side--a" aria-labelledby="id_team_a_name">
+        <div class="compose-team-block">
+          <div class="compose-team-name-label">
+            <input
+              type="text"
+              name="team_a_name"
+              id="id_team_a_name"
+              class="compose-team-name-input"
+              value="Équipe 1"
+              required
+              maxlength="200"
+              placeholder="Équipe 1"
+              aria-label="Nom de l’équipe 1"
+            >
+          </div>
+          <div class="compose-encart compose-encart--a">
+            <div
+              class="compose-zone-inner compose-zone-inner--drop"
+              data-compose-zone="team-a"
+            >
+              {% for p in team_a_members %}
+                {% include 'myapp/_compose_participant_card.html' %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="compose-center" aria-labelledby="compose-h-pool">
+        <h2 id="compose-h-pool" class="compose-sr-only">Participants à répartir dans les équipes</h2>
+        <div class="compose-encart compose-encart--pool">
+          <div
+            class="compose-zone-inner compose-zone-inner--pool"
+            data-compose-zone="pool"
+          >
+            {% for p in pool %}
+              {% include 'myapp/_compose_participant_card.html' %}
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <aside class="compose-side compose-side--b" aria-labelledby="id_team_b_name">
+        <div class="compose-team-block">
+          <div class="compose-team-name-label">
+            <input
+              type="text"
+              name="team_b_name"
+              id="id_team_b_name"
+              class="compose-team-name-input"
+              value="Équipe 2"
+              required
+              maxlength="200"
+              placeholder="Équipe 2"
+              aria-label="Nom de l’équipe 2"
+            >
+          </div>
+          <div class="compose-encart compose-encart--b">
+            <div
+              class="compose-zone-inner compose-zone-inner--drop"
+              data-compose-zone="team-b"
+            >
+              {% for p in team_b_members %}
+                {% include 'myapp/_compose_participant_card.html' %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div
+      class="compose-ready-panel"
+      id="compose-ready-panel"
+      hidden
+      aria-hidden="true"
+    >
+      <div class="compose-ready-panel__glow" aria-hidden="true"></div>
+      <button type="submit" id="compose-cta-parti" class="compose-cta-parti">
+        <span class="compose-cta-parti__star compose-cta-parti__star--l" aria-hidden="true">✦</span>
+        <span class="compose-cta-parti__label">C’est parti !</span>
+        <span class="compose-cta-parti__star compose-cta-parti__star--r" aria-hidden="true">✦</span>
+      </button>
+    </div>
+  </form>
+  {% endif %}
+
+  <script src="{% static 'myapp/js/game-compose.js' %}" defer></script>
+</body>
+</html>

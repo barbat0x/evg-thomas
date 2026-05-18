@@ -1,0 +1,29 @@
+<aside
+  class="play-side play-side--{{ side }}{% if current_team and current_team.pk == team.pk %} play-side--active-turn{% endif %}"
+  aria-label="{{ team.name }}"
+>
+  <h2 class="play-team-name">{{ team.name }}</h2>
+  <div class="play-team-photos">
+    {% for m in team.memberships.all %}
+    <div
+      class="play-photo-wrap{% if m.participant.photo %} play-photo-wrap--face-mask{% endif %}{% if m.participant.name == 'Julien B' %} play-photo-wrap--julien-b{% endif %}"
+      data-play-tilt
+      {% if m.participant.photo %}style="--play-face-mask: url('{{ m.participant.photo.url }}')"{% endif %}
+    >
+      {% if m.participant.photo %}
+      <img
+        class="play-photo"
+        src="{{ m.participant.photo.url }}"
+        alt=""
+        width="176"
+        height="176"
+        loading="lazy"
+        decoding="async"
+      >
+      {% else %}
+      <span class="play-photo play-photo--placeholder" aria-hidden="true"></span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</aside>

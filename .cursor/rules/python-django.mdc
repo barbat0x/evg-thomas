@@ -1,0 +1,18 @@
+---
+description: Conventions Python et Django pour ce dépôt
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python & Django
+
+**Doc détaillée** : `docs/python-django-best-practices.md` — à ouvrir pour toute décision structurante ou litige de style.
+
+## Code
+
+- **PEP 8** : 4 espaces ; imports stdlib → tiers → local ; pas de `import *` ; imports absolus de préférence ; nommage cohérent.
+- **Django** : pas de secrets dans le repo ; `DEBUG` / `ALLOWED_HOSTS` / clés via l’environnement ; migrations versionnées ; éviter le SQL brut sauf nécessité.
+- **Couche métier** : garder les vues fines ; extraire services / sélecteurs quand la logique grossit (voir styleguide cité dans le doc projet).
+- **Si Django REST Framework est ajouté** : serializers et vues ciblés ; gérer proprement `ValidationError` côté API.
+
+En cas de conflit, **ce dépôt** et la **documentation Django officielle** priment sur les guides externes.

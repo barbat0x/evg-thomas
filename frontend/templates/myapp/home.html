@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tout le monde veut le voir boire</title>
+  {% load static %}
+  {% load l10n %}
+  <link rel="stylesheet" href="{% static 'myapp/css/home.css' %}">
+</head>
+<body class="home-body">
+  <div class="home-center-photo">
+    <img
+      class="home-center-photo__img home-center-photo__img--tilt-{{ home_photo_tilt }}"
+      src="{{ MEDIA_URL }}thomas.png"
+      alt=""
+      decoding="async">
+  </div>
+  <div class="home-orbit-field" id="home-orbit-field" aria-hidden="true">
+    {% localize off %}
+    {% for s in stars %}
+    <img
+      class="home-star-img js-orbit-sprite"
+      src="{% static 'myapp/img/etoile.png' %}"
+      alt=""
+      decoding="async"
+      style="width: {{ s.size|floatformat:0 }}px; max-width: {{ s.size|floatformat:0 }}px; height: auto;"
+      data-rx-pct="{{ s.rx_pct }}"
+      data-ry-pct="{{ s.ry_pct }}"
+      data-speed="{{ s.speed }}"
+      data-phase="{{ s.phase }}"
+      data-tilt="{{ s.tilt }}"
+    >
+    {% endfor %}
+    {% for icon in home_icons %}
+    <img
+      class="home-orbit-icon js-orbit-sprite"
+      src="{{ MEDIA_URL }}{{ icon.file }}"
+      alt=""
+      decoding="async"
+      style="width: {{ icon.size|floatformat:0 }}px; max-width: {{ icon.size|floatformat:0 }}px; height: auto;"
+      data-rx-pct="{{ icon.rx_pct }}"
+      data-ry-pct="{{ icon.ry_pct }}"
+      data-speed="{{ icon.speed }}"
+      data-phase="{{ icon.phase }}"
+      data-tilt="{{ icon.tilt }}"
+    >
+    {% endfor %}
+    {% endlocalize %}
+  </div>
+
+  <header class="home-header">
+    <h1 class="home-title">Tout le monde veut le voir boire</h1>
+  </header>
+
+  <main class="home-main">
+    <a href="{% url 'begin_party' %}" class="home-cta" id="home-cta">
+      <span class="home-cta__star home-cta__star--l" aria-hidden="true">✦</span>
+      <span class="home-cta__label">Commencer la partie</span>
+      <span class="home-cta__star home-cta__star--r" aria-hidden="true">✦</span>
+    </a>
+  </main>
+  <script src="{% static 'myapp/js/home-orbit.js' %}" defer></script>
+</body>
+</html>

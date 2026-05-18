@@ -1,0 +1,14 @@
+---
+description: Contexte dépôt et quand consulter la doc (toujours actif)
+alwaysApply: true
+---
+
+# Projet evg-thomas
+
+- **Stack** : Django 6, PostgreSQL, package `config/`. Mise en route et ops : **`README.md`** (`.env`, `scripts/`, migrations).
+- **Avant une évolution structurante** (settings, nouvelle app majeure, auth, perf, déploiement, refactor large) : **lire `docs/python-django-best-practices.md`** et s’y aligner.
+- **Code Python** : appliquer **`.cursor/rules/python-django.mdc`** (fichiers `*.py`).
+- **Hiérarchie** : conventions de ce dépôt → doc Django officielle → autres guides cités dans le doc projet.
+- **Sécurité** : pas de secrets dans le dépôt ; uniquement variables d’environnement / `.env` local (non versionné).
+
+Point d’entrée humain + agent : **`AGENTS.md`**.

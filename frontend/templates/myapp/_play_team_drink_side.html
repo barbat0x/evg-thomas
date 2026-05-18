@@ -1,0 +1,79 @@
+{% if side == 'a' %}
+  {% with ng=drink_team_a_gorgees ns=drink_team_a_shots tname=game.team_a.name %}
+  <div
+    class="play-team-drink play-team-drink--a"
+    role="group"
+    aria-label="{{ tname }} : {{ score_a_total }} {% if score_a_total == 1 %}pt{% else %}pts{% endif %}, {% if ng == 1 %}1 gorgée{% elif ng > 0 %}{{ ng }} gorgées{% else %}0 gorgées{% endif %}, {% if ns == 1 %}1 shot{% elif ns > 0 %}{{ ns }} shots{% else %}0 shot{% endif %}">
+    <p class="play-team-drink__score">
+      {% if score_a_total == 1 %}1 pt{% else %}{{ score_a_total }} pts{% endif %}
+    </p>
+    <div class="play-team-drink__metrics">
+      <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--zone-a" data-drink-metric="a-g">
+        <img
+          class="play-drink-metric__icon"
+          src="{{ MEDIA_URL }}cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ ng }}</span>
+          <span class="play-drink-metric__lbl">{% if ng == 1 %}gorgée{% else %}gorgées{% endif %}</span>
+        </div>
+      </div>
+      <div class="play-drink-metric play-drink-metric--shots play-drink-metric--zone-a" data-drink-metric="a-s">
+        <img
+          class="play-drink-metric__icon play-drink-metric__icon--fire"
+          src="{{ MEDIA_URL }}fire-cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ ns }}</span>
+          <span class="play-drink-metric__lbl">{% if ns == 1 %}shot{% else %}shots{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+{% else %}
+  {% with ng=drink_team_b_gorgees ns=drink_team_b_shots tname=game.team_b.name %}
+  <div
+    class="play-team-drink play-team-drink--b"
+    role="group"
+    aria-label="{{ tname }} : {{ score_b_total }} {% if score_b_total == 1 %}pt{% else %}pts{% endif %}, {% if ng == 1 %}1 gorgée{% elif ng > 0 %}{{ ng }} gorgées{% else %}0 gorgées{% endif %}, {% if ns == 1 %}1 shot{% elif ns > 0 %}{{ ns }} shots{% else %}0 shot{% endif %}">
+    <p class="play-team-drink__score">
+      {% if score_b_total == 1 %}1 pt{% else %}{{ score_b_total }} pts{% endif %}
+    </p>
+    <div class="play-team-drink__metrics">
+      <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--zone-b" data-drink-metric="b-g">
+        <img
+          class="play-drink-metric__icon"
+          src="{{ MEDIA_URL }}cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ ng }}</span>
+          <span class="play-drink-metric__lbl">{% if ng == 1 %}gorgée{% else %}gorgées{% endif %}</span>
+        </div>
+      </div>
+      <div class="play-drink-metric play-drink-metric--shots play-drink-metric--zone-b" data-drink-metric="b-s">
+        <img
+          class="play-drink-metric__icon play-drink-metric__icon--fire"
+          src="{{ MEDIA_URL }}fire-cocktail.png"
+          alt=""
+          width="36"
+          height="36"
+          decoding="async">
+        <div class="play-drink-metric__body">
+          <span class="play-drink-metric__num">{{ ns }}</span>
+          <span class="play-drink-metric__lbl">{% if ns == 1 %}shot{% else %}shots{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+{% endif %}

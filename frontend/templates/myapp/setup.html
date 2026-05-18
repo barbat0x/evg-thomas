@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Préparation — quiz</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myapp/css/setup.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">Préparation du quiz</h1>
+      <nav class="header-actions" aria-label="Navigation">
+        <span class="user-label">{{ user.get_username }}</span>
+        <a href="{% url 'admin:index' %}" class="link-muted">Admin Django</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}
+      <li class="message message-{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <section class="card" aria-labelledby="h-participants">
+      <h2 id="h-participants">Participants</h2>
+      <p class="lead">Créez d’abord des personnes réutilisables dans les équipes.</p>
+      <form method="post" class="stack" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_participant">
+        <div class="field-row">
+          {{ participant_form.name.label_tag }}
+          {{ participant_form.name }}
+          {% if participant_form.name.errors %}<p class="error">{{ participant_form.name.errors }}</p>{% endif %}
+        </div>
+        <div class="field-row">
+          {{ participant_form.photo.label_tag }}
+          {{ participant_form.photo }}
+          {% if participant_form.photo.help_text %}<p class="muted field-help">{{ participant_form.photo.help_text }}</p>{% endif %}
+          {% if participant_form.photo.errors %}<p class="error">{{ participant_form.photo.errors }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn primary">Ajouter le participant</button>
+      </form>
+      {% if participants %}
+      <ul class="participant-list">
+        {% for p in participants %}
+        <li class="participant-row participant-row--with-actions">
+          {% if p.photo %}
+          <img src="{{ p.photo.url }}" alt="" class="participant-avatar" width="40" height="40" loading="lazy" decoding="async">
+          {% else %}
+          <span class="participant-avatar participant-avatar--placeholder" aria-hidden="true"></span>
+          {% endif %}
+          <span class="participant-name">{{ p.name }}</span>
+          <a href="{% url 'edit_participant' p.pk %}" class="btn small secondary">Modifier</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">Aucun participant pour l’instant.</p>
+      {% endif %}
+    </section>
+
+    <section class="card" aria-labelledby="h-teams">
+      <h2 id="h-teams">Équipes</h2>
+      <p class="lead">Créez une équipe puis rattachez-y des participants.</p>
+
+      <h3 class="subsection-title">Nouvelle équipe</h3>
+      <form method="post" class="stack">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_team">
+        <div class="field-row">
+          {{ team_form.name.label_tag }}
+          {{ team_form.name }}
+          {% if team_form.name.errors %}<p class="error">{{ team_form.name.errors }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn primary">Créer l’équipe</button>
+      </form>
+
+      <h3 class="subsection-title">Ajouter un membre</h3>
+      <form method="post" class="stack">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_team_member">
+        <div class="field-row">
+          {{ team_member_form.team.label_tag }}
+          {{ team_member_form.team }}
+          {% if team_member_form.team.errors %}<p class="error">{{ team_member_form.team.errors }}</p>{% endif %}
+        </div>
+        <div class="field-row">
+          {{ team_member_form.participant.label_tag }}
+          {{ team_member_form.participant }}
+          {% if team_member_form.participant.errors %}<p class="error">{{ team_member_form.participant.errors }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn primary">Ajouter à l’équipe</button>
+      </form>
+
+      {% if teams %}
+      <div class="team-list">
+        {% for team in teams %}
+        <article class="team-block">
+          <div class="team-block-header">
+            <h4>{{ team.name }}</h4>
+            <div class="team-block-actions">
+              <a href="{% url 'manage_team_members' team.pk %}" class="btn small secondary">Membres</a>
+              <a href="{% url 'edit_team' team.pk %}" class="btn small secondary">Modifier</a>
+            </div>
+          </div>
+          {% if team.memberships.all %}
+          <ol>
+            {% for m in team.memberships.all %}
+            <li>{{ m.participant.name }}</li>
+            {% endfor %}
+          </ol>
+          {% else %}
+          <p class="muted">Aucun membre — ajoutez des participants ci-dessus.</p>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">Aucune équipe pour l’instant.</p>
+      {% endif %}
+    </section>
+
+    <section class="card" aria-labelledby="h-games">
+      <h2 id="h-games">Parties</h2>
+      <p class="lead">Chaque partie oppose deux équipes. Une question à la fois, à tour de rôle (équipe A puis B).</p>
+
+      <form method="post" class="stack">
+        {% csrf_token %}
+        {% if game_form.non_field_errors %}
+        <p class="error">{{ game_form.non_field_errors }}</p>
+        {% endif %}
+        <div class="field-row">
+          {{ game_form.team_a.label_tag }}
+          {{ game_form.team_a }}
+          {% if game_form.team_a.errors %}<p class="error">{{ game_form.team_a.errors }}</p>{% endif %}
+        </div>
+        <div class="field-row">
+          {{ game_form.team_b.label_tag }}
+          {{ game_form.team_b }}
+          {% if game_form.team_b.errors %}<p class="error">{{ game_form.team_b.errors }}</p>{% endif %}
+        </div>
+        <div class="form-actions">
+          <button type="submit" name="action" value="add_game" class="btn secondary">Créer (préparation)</button>
+          <button type="submit" name="action" value="create_and_play" class="btn primary">Nouvelle partie</button>
+        </div>
+      </form>
+
+      {% if games %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Équipe A</th>
+              <th>Équipe B</th>
+              <th>État</th>
+              <th>Prochain tour</th>
+              <th>Scores (pts)</th>
+              <th>B / M (par équipe)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for game in games %}
+            <tr>
+              <td>{{ game.pk }}</td>
+              <td>{{ game.team_a.name }}</td>
+              <td>{{ game.team_b.name }}</td>
+              <td>{{ game.get_status_display }}</td>
+              <td>
+                {% if game.status == 'in_progress' %}
+                  {{ game.team_for_turn.name }}
+                {% else %}
+                  <span class="muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% for s in game.scores_by_team.all %}
+                  {% if s.team_id == game.team_a_id %}<strong>{{ s.score_total }}</strong>{% endif %}
+                {% endfor %}
+                &nbsp;/&nbsp;
+                {% for s in game.scores_by_team.all %}
+                  {% if s.team_id == game.team_b_id %}<strong>{{ s.score_total }}</strong>{% endif %}
+                {% endfor %}
+              </td>
+              <td class="muted">
+                {% for s in game.scores_by_team.all %}
+                  {% if s.team_id == game.team_a_id %}{{ s.correct_answers_count }}/{{ s.wrong_answers_count }}{% endif %}
+                {% endfor %}
+                &nbsp;·&nbsp;
+                {% for s in game.scores_by_team.all %}
+                  {% if s.team_id == game.team_b_id %}{{ s.correct_answers_count }}/{{ s.wrong_answers_count }}{% endif %}
+                {% endfor %}
+              </td>
+              <td class="cell-actions">
+                {% if game.status == 'preparation' %}
+                <div class="cell-actions-row">
+                  <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="start_game">
+                    <input type="hidden" name="game_id" value="{{ game.pk }}">
+                    <button type="submit" class="btn small">Démarrer</button>
+                  </form>
+                  <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="start_and_play">
+                    <input type="hidden" name="game_id" value="{{ game.pk }}">
+                    <button type="submit" class="btn small primary">Nouvelle partie</button>
+                  </form>
+                </div>
+                {% elif game.status == 'in_progress' %}
+                <div class="cell-actions-row">
+                  <a href="{% url 'play_game' game.pk %}" class="btn small primary" target="_blank" rel="noopener">Jeu</a>
+                  <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="finish_game">
+                    <input type="hidden" name="game_id" value="{{ game.pk }}">
+                    <button type="submit" class="btn small secondary">Terminer</button>
+                  </form>
+                </div>
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">Aucune partie pour l’instant.</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,881 @@
+:root {
+  --compose-bg: #c8e7fc;
+  --compose-bg-deep: #a8d8f5;
+  --compose-text: #0d3a5c;
+  --compose-muted: #3d6a8a;
+  --compose-card-bg: rgba(255, 255, 255, 0.88);
+  --compose-border: rgba(13, 58, 92, 0.18);
+  --compose-cta-bg: #1565c0;
+  --compose-cta-text: #ffffff;
+  --compose-zone-a: #4da3ff;
+  --compose-zone-b: #5ce1c5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.compose-body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Ubuntu,
+    sans-serif;
+  color: var(--compose-text);
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 15%,
+    #dff2ff 0%,
+    var(--compose-bg) 42%,
+    var(--compose-bg-deep) 100%
+  );
+  padding: 1.25rem 1rem 2.5rem;
+}
+
+.compose-header {
+  max-width: 72rem;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.compose-back {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--compose-muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.compose-back:hover {
+  text-decoration: underline;
+  color: var(--compose-text);
+}
+
+.compose-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--compose-muted);
+}
+
+.compose-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.45rem, 4.2vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65),
+    0 2px 16px rgba(255, 255, 255, 0.4);
+}
+
+.compose-lead {
+  margin: 0;
+  color: var(--compose-muted);
+  font-size: 1rem;
+  line-height: 1.45;
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.compose-messages {
+  list-style: none;
+  max-width: 72rem;
+  margin: 0 auto 1rem;
+  padding: 0;
+}
+
+.compose-msg {
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  margin-bottom: 0.35rem;
+}
+
+.compose-msg--error {
+  background: rgba(255, 80, 80, 0.15);
+  color: #8b1c1c;
+}
+
+.compose-msg--success {
+  background: rgba(92, 225, 197, 0.18);
+  color: #0d5c4a;
+}
+
+.compose-msg--debug,
+.compose-msg--info {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--compose-text);
+}
+
+.compose-empty {
+  max-width: 40rem;
+  margin: 2rem auto;
+  text-align: center;
+  color: var(--compose-muted);
+}
+
+.compose-form {
+  max-width: 100rem;
+  margin: 0 auto;
+  width: 100%;
+  padding-inline: clamp(0.25rem, 2vw, 1.75rem);
+}
+
+/* Trois colonnes : équipes plus vers les bords, centre plus étroit */
+.compose-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .compose-layout {
+    grid-template-columns: minmax(8rem, 0.82fr) minmax(15rem, 1.36fr) minmax(8rem, 0.82fr);
+    gap: clamp(1.75rem, 3.5vw, 3rem);
+    min-height: min(58vh, 520px);
+  }
+
+  .compose-side--a {
+    max-width: 13rem;
+    justify-self: start;
+    width: 100%;
+  }
+
+  .compose-side--b {
+    max-width: 13rem;
+    justify-self: end;
+    width: 100%;
+  }
+}
+
+.compose-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.compose-team-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.compose-team-name-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.compose-team-name-input {
+  display: block;
+  font-family: inherit;
+  font-size: clamp(1.05rem, 3vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.2rem 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--compose-text);
+  width: 100%;
+  box-shadow: none;
+  appearance: none;
+}
+
+.compose-side--a .compose-team-name-input {
+  color: #0d4a7a;
+}
+
+.compose-side--b .compose-team-name-input {
+  color: #0d6b5c;
+}
+
+.compose-team-name-input::placeholder {
+  color: inherit;
+  opacity: 0.45;
+}
+
+.compose-team-name-input:focus {
+  outline: none;
+  border-bottom-color: var(--compose-zone-a);
+  box-shadow: none;
+}
+
+.compose-side--b .compose-team-name-input:focus {
+  border-bottom-color: var(--compose-zone-b);
+}
+
+.compose-encart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 12rem;
+  padding: 0.62rem;
+  border-radius: 16px;
+  border: 2px solid var(--compose-border);
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 4px 20px rgba(13, 58, 92, 0.08);
+}
+
+.compose-encart--a,
+.compose-encart--b {
+  background: transparent;
+  border-radius: 18px;
+}
+
+.compose-encart--a {
+  border: 3px dashed var(--compose-zone-a);
+  box-shadow:
+    5px 5px 0 0 rgba(77, 163, 255, 0.38),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.compose-encart--b {
+  border: 3px dashed var(--compose-zone-b);
+  box-shadow:
+    -5px 5px 0 0 rgba(92, 225, 197, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.compose-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.compose-encart--pool {
+  flex: 1;
+  min-height: 14rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.compose-center .compose-encart--pool {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Overlay plein écran : bouton au centre de la page, interactions drag conservées sous le calque (pointer-events). */
+.compose-ready-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  pointer-events: none;
+}
+
+.compose-ready-panel[hidden] {
+  display: none !important;
+}
+
+.compose-ready-panel__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 72% 62% at 50% 48%,
+    rgba(223, 242, 255, 0.92) 0%,
+    rgba(200, 231, 252, 0.55) 42%,
+    rgba(168, 216, 245, 0) 72%
+  );
+  pointer-events: none;
+  animation: compose-ready-glow 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes compose-ready-glow {
+  from {
+    opacity: 0.88;
+    filter: brightness(1);
+  }
+
+  to {
+    opacity: 1;
+    filter: brightness(1.06);
+  }
+}
+
+.compose-cta-parti {
+  position: relative;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 2vw, 1rem);
+  margin: 0;
+  padding: clamp(1.1rem, 3.5vw, 1.65rem) clamp(1.75rem, 6vw, 3.25rem);
+  font: inherit;
+  font-size: clamp(2rem, 7.5vw, 3.35rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 999px;
+  border: 3px dashed rgba(255, 255, 255, 0.65);
+  background: linear-gradient(
+    132deg,
+    var(--compose-zone-a) 0%,
+    #1976d2 42%,
+    #1289c4 58%,
+    var(--compose-zone-b) 100%
+  );
+  background-size: 220% 220%;
+  box-shadow:
+    0 0 0 4px rgba(13, 58, 92, 0.1),
+    10px 12px 0 rgba(77, 163, 255, 0.4),
+    -8px 14px 0 rgba(92, 225, 197, 0.32),
+    0 18px 48px rgba(13, 71, 161, 0.38),
+    0 3px 0 rgba(255, 255, 255, 0.38) inset;
+  text-shadow:
+    0 2px 0 rgba(13, 58, 92, 0.22),
+    0 0 28px rgba(255, 255, 255, 0.35);
+  transform: rotate(-1.2deg) scale(1);
+  animation:
+    compose-parti-wiggle 5s ease-in-out infinite,
+    compose-parti-shimmer 8s ease infinite;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+@keyframes compose-parti-wiggle {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) scale(1);
+  }
+
+  20% {
+    transform: rotate(0.9deg) scale(1.03);
+  }
+
+  40% {
+    transform: rotate(-0.4deg) scale(1.01);
+  }
+
+  60% {
+    transform: rotate(1deg) scale(1.02);
+  }
+
+  80% {
+    transform: rotate(-0.7deg) scale(1);
+  }
+}
+
+@keyframes compose-parti-shimmer {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+.compose-cta-parti__label {
+  display: inline-block;
+}
+
+.compose-cta-parti__star {
+  font-size: 0.55em;
+  line-height: 1;
+  opacity: 0.95;
+  animation: compose-parti-star 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgba(13, 58, 92, 0.25));
+}
+
+.compose-cta-parti__star--l {
+  animation-delay: 0s;
+}
+
+.compose-cta-parti__star--r {
+  animation-delay: 0.35s;
+}
+
+@keyframes compose-parti-star {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: scale(1.35) rotate(18deg);
+    opacity: 1;
+  }
+}
+
+.compose-cta-parti:hover:not(:disabled) {
+  animation: none;
+  filter: brightness(1.09) saturate(1.08);
+  transform: rotate(0deg) scale(1.08);
+  box-shadow:
+    0 0 0 4px rgba(13, 58, 92, 0.12),
+    12px 14px 0 rgba(77, 163, 255, 0.42),
+    -10px 16px 0 rgba(92, 225, 197, 0.36),
+    0 22px 56px rgba(13, 71, 161, 0.42),
+    0 3px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.compose-cta-parti:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 3px rgba(13, 58, 92, 0.1),
+    4px 5px 0 rgba(77, 163, 255, 0.35),
+    -3px 6px 0 rgba(92, 225, 197, 0.3),
+    0 10px 28px rgba(13, 71, 161, 0.3),
+    0 2px 0 rgba(255, 255, 255, 0.35) inset;
+}
+
+.compose-cta-parti:focus-visible {
+  outline: 3px solid var(--compose-zone-b);
+  outline-offset: 5px;
+}
+
+.compose-cta-parti:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.compose-form--submitting .compose-cta-parti {
+  pointer-events: none;
+  cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compose-ready-panel__glow,
+  .compose-cta-parti,
+  .compose-cta-parti__star {
+    animation: none !important;
+  }
+
+  .compose-cta-parti {
+    transform: none;
+  }
+}
+
+.compose-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+}
+
+@media (min-width: 960px) {
+  .compose-center {
+    justify-content: center;
+  }
+}
+
+/* Au centre : uniquement les portraits, plus grands, sans cadre de carte */
+.compose-zone-inner--pool .compose-card {
+  width: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.compose-zone-inner--pool .compose-card-photo,
+.compose-zone-inner--pool .compose-card-photo--placeholder {
+  width: 240px;
+  height: 240px;
+  margin: 0;
+  border-radius: 14px;
+  border: none;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform var(--pool-tilt-duration, 1s) ease-in-out;
+  will-change: transform;
+}
+
+.compose-zone-inner--pool .compose-card--julien-b .compose-card-photo,
+.compose-zone-inner--pool .compose-card--julien-b .compose-card-photo--placeholder {
+  width: 317px;
+  height: 317px;
+}
+
+.compose-zone-inner--pool .compose-card--pool-tilt-left .compose-card-photo,
+.compose-zone-inner--pool .compose-card--pool-tilt-left .compose-card-photo--placeholder {
+  transform: rotate(-30deg);
+}
+
+.compose-zone-inner--pool .compose-card--pool-tilt-right .compose-card-photo,
+.compose-zone-inner--pool .compose-card--pool-tilt-right .compose-card-photo--placeholder {
+  transform: rotate(30deg);
+}
+
+.compose-zone-inner--pool .compose-card--dragging .compose-card-photo,
+.compose-zone-inner--pool .compose-card--dragging .compose-card-photo--placeholder {
+  transition: none;
+  transform: none;
+  outline: 2px dashed var(--compose-zone-a);
+  outline-offset: 4px;
+}
+
+.compose-zone-inner--pool .compose-card-photo--placeholder {
+  border: 1px dashed rgba(13, 58, 92, 0.2);
+}
+
+.compose-zone-inner--pool .compose-card-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.compose-zone-inner--pool .compose-card--dragging {
+  outline: none;
+  opacity: 0.85;
+}
+
+.compose-zone-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-content: flex-start;
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.15s ease;
+}
+
+.compose-zone-inner--pool {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: start;
+  min-height: 14rem;
+  padding: 0.5rem 0;
+  gap: 0.55rem 0.75rem;
+  background: transparent;
+  border-radius: 0;
+}
+
+.compose-zone-inner--pool .compose-pool-slot-placeholder {
+  width: 240px;
+  height: 240px;
+  margin: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.compose-zone-inner--pool .compose-pool-slot-placeholder--julien-b {
+  width: 317px;
+  height: 317px;
+}
+
+@media (min-width: 960px) {
+  .compose-zone-inner--pool {
+    min-height: 18rem;
+  }
+}
+
+.compose-zone-inner--drop {
+  min-height: 10rem;
+  background: transparent;
+}
+
+.compose-zone-inner:focus-within,
+.compose-zone-inner:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.compose-zone-inner--pool:focus-within,
+.compose-zone-inner--pool:hover {
+  background: transparent;
+}
+
+/* Après la règle générale : pas de voile blanc au survol des zones équipe */
+.compose-zone-inner--drop:focus-within,
+.compose-zone-inner--drop:hover {
+  background: transparent !important;
+}
+
+.compose-zone-inner--drop .compose-card-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.compose-zone-inner--drop .compose-card {
+  width: auto;
+  max-width: 100%;
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0;
+}
+
+.compose-zone-inner--drop .compose-card-photo,
+.compose-zone-inner--drop .compose-card-photo--placeholder {
+  display: block;
+  margin: 0;
+  border: none;
+  border-radius: 14px;
+}
+
+.compose-zone-inner--drop .compose-card-photo--placeholder {
+  border: 1px dashed rgba(13, 58, 92, 0.2) !important;
+}
+
+.compose-body.compose-is-dragging {
+  cursor: grabbing;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.compose-card--dragging-source {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.compose-drag-ghost {
+  pointer-events: none !important;
+  cursor: grabbing !important;
+}
+
+/* Portrait seul (comme dans le pool), sans carte blanche */
+.compose-drag-ghost.compose-drag-ghost--from-pool {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+}
+
+.compose-drag-ghost--from-pool .compose-card-photo,
+.compose-drag-ghost--from-pool .compose-card-photo--placeholder {
+  display: block;
+  width: 240px;
+  height: 240px;
+  margin: 0;
+  border-radius: 14px;
+  border: none;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: none !important;
+  box-shadow: none !important;
+}
+
+.compose-drag-ghost--from-pool.compose-card--julien-b .compose-card-photo,
+.compose-drag-ghost--from-pool.compose-card--julien-b .compose-card-photo--placeholder {
+  width: 317px;
+  height: 317px;
+}
+
+.compose-drag-ghost--from-pool .compose-card-photo--placeholder {
+  border: 1px dashed rgba(13, 58, 92, 0.2) !important;
+  background: linear-gradient(135deg, #dfeaf5, #c5dbe8);
+}
+
+.compose-drag-ghost--from-pool.compose-card--pool-tilt-left .compose-card-photo,
+.compose-drag-ghost--from-pool.compose-card--pool-tilt-left .compose-card-photo--placeholder {
+  transform: rotate(-30deg);
+}
+
+.compose-drag-ghost--from-pool.compose-card--pool-tilt-right .compose-card-photo,
+.compose-drag-ghost--from-pool.compose-card--pool-tilt-right .compose-card-photo--placeholder {
+  transform: rotate(30deg);
+}
+
+/* Fantôme équipe : portrait seul, comme après drop */
+.compose-drag-ghost.compose-drag-ghost--from-team {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+}
+
+.compose-drag-ghost--from-team .compose-card-photo,
+.compose-drag-ghost--from-team .compose-card-photo--placeholder {
+  transition: none !important;
+  transform: none !important;
+  margin: 0 !important;
+  border: none;
+  border-radius: 14px;
+  box-shadow: none !important;
+}
+
+.compose-drag-ghost--from-team .compose-card-photo--placeholder {
+  border: 1px dashed rgba(13, 58, 92, 0.2) !important;
+}
+
+.compose-drag-ghost .compose-card-name {
+  visibility: hidden;
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.compose-card {
+  position: relative;
+  width: 11.5rem;
+  padding: 0.5rem;
+  background: var(--compose-card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--compose-border);
+  box-shadow: 0 2px 8px rgba(13, 58, 92, 0.08);
+  cursor: grab;
+  touch-action: manipulation;
+}
+
+.compose-card:active {
+  cursor: grabbing;
+}
+
+.compose-card--dragging {
+  opacity: 0.65;
+  outline: 2px dashed var(--compose-zone-a);
+}
+
+.compose-card-photo {
+  display: block;
+  width: 152px;
+  height: 152px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0 auto 0.4rem;
+  border: 1px solid var(--compose-border);
+}
+
+.compose-card-photo--placeholder {
+  display: block;
+  width: 152px;
+  height: 152px;
+  margin: 0 auto 0.4rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dfeaf5, #c5dbe8);
+  border: 1px dashed var(--compose-border);
+}
+
+.compose-card--julien-b {
+  width: 13.25rem;
+}
+
+.compose-card--julien-b .compose-card-photo,
+.compose-card--julien-b .compose-card-photo--placeholder {
+  width: 202px;
+  height: 202px;
+}
+
+.compose-card-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.compose-card-name {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid var(--compose-border);
+  background: #fff;
+}
+
+.compose-card-name:focus {
+  outline: none;
+  border-color: var(--compose-zone-a);
+}
+
+.compose-actions {
+  text-align: center;
+}
+
+.compose-cta {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-size: clamp(1.05rem, 3vw, 1.5rem);
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--compose-cta-text);
+  background: linear-gradient(160deg, #1976d2, var(--compose-cta-bg));
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 8px 28px rgba(13, 71, 161, 0.35),
+    0 2px 0 rgba(255, 255, 255, 0.25) inset;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+}
+
+.compose-cta:hover {
+  filter: brightness(1.05);
+  transform: scale(1.02);
+}
+
+.compose-cta:active {
+  transform: scale(0.98);
+}
+
+.compose-cta:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
