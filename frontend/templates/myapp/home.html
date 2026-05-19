@@ -12,7 +12,7 @@
   <div class="home-center-photo">
     <img
       class="home-center-photo__img home-center-photo__img--tilt-{{ home_photo_tilt }}"
-      src="{{ MEDIA_URL }}thomas.png"
+      src="{% static 'myapp/img/thomas.png' %}"
       alt=""
       decoding="async">
   </div>
@@ -35,7 +35,7 @@
     {% for icon in home_icons %}
     <img
       class="home-orbit-icon js-orbit-sprite"
-      src="{{ MEDIA_URL }}{{ icon.file }}"
+      src="{% static 'myapp/img/' %}{{ icon.file }}"
       alt=""
       decoding="async"
       style="width: {{ icon.size|floatformat:0 }}px; max-width: {{ icon.size|floatformat:0 }}px; height: auto;"

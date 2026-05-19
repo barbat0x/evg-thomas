@@ -1,3 +1,4 @@
+{% load static %}
 {% if side == 'a' %}
   {% with ng=drink_team_a_gorgees ns=drink_team_a_shots tname=game.team_a.name %}
   <div
@@ -11,7 +12,7 @@
       <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--zone-a" data-drink-metric="a-g">
         <img
           class="play-drink-metric__icon"
-          src="{{ MEDIA_URL }}cocktail.png"
+          src="{% static 'myapp/img/cocktail.png' %}"
           alt=""
           width="36"
           height="36"
@@ -24,7 +25,7 @@
       <div class="play-drink-metric play-drink-metric--shots play-drink-metric--zone-a" data-drink-metric="a-s">
         <img
           class="play-drink-metric__icon play-drink-metric__icon--fire"
-          src="{{ MEDIA_URL }}fire-cocktail.png"
+          src="{% static 'myapp/img/fire-cocktail.png' %}"
           alt=""
           width="36"
           height="36"
@@ -50,7 +51,7 @@
       <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--zone-b" data-drink-metric="b-g">
         <img
           class="play-drink-metric__icon"
-          src="{{ MEDIA_URL }}cocktail.png"
+          src="{% static 'myapp/img/cocktail.png' %}"
           alt=""
           width="36"
           height="36"
@@ -63,7 +64,7 @@
       <div class="play-drink-metric play-drink-metric--shots play-drink-metric--zone-b" data-drink-metric="b-s">
         <img
           class="play-drink-metric__icon play-drink-metric__icon--fire"
-          src="{{ MEDIA_URL }}fire-cocktail.png"
+          src="{% static 'myapp/img/fire-cocktail.png' %}"
           alt=""
           width="36"
           height="36"

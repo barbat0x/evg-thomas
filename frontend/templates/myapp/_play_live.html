@@ -1,3 +1,4 @@
+{% load static %}
 {% if messages %}
   <ul class="play-messages">
     {% for message in messages %}
@@ -23,7 +24,7 @@
       <div class="play-drink-metric play-drink-metric--gorgees play-drink-metric--thomas play-drink-metric--td-{% if drink_thomas_gorgees < 10 %}1{% elif drink_thomas_gorgees < 100 %}2{% elif drink_thomas_gorgees < 1000 %}3{% else %}4{% endif %}" data-drink-metric="t-g">
         <img
           class="play-drink-metric__icon"
-          src="{{ MEDIA_URL }}cocktail.png"
+          src="{% static 'myapp/img/cocktail.png' %}"
           alt=""
           width="36"
           height="36"
@@ -33,17 +34,17 @@
           <span class="play-drink-metric__lbl">{% if drink_thomas_gorgees == 1 %}gorgée{% else %}gorgées{% endif %}</span>
         </div>
       </div>
-      <div class="play-top-photo play-top-photo--face-mask" aria-hidden="true" style="--play-face-mask: url('{{ MEDIA_URL }}thomas.png')">
+      <div class="play-top-photo play-top-photo--face-mask" aria-hidden="true" style="--play-face-mask: url('{% static 'myapp/img/thomas.png' %}')">
         <img
           class="play-top-photo__img"
-          src="{{ MEDIA_URL }}thomas.png"
+          src="{% static 'myapp/img/thomas.png' %}"
           alt=""
           decoding="async">
       </div>
       <div class="play-drink-metric play-drink-metric--shots play-drink-metric--thomas play-drink-metric--td-{% if drink_thomas_shots < 10 %}1{% elif drink_thomas_shots < 100 %}2{% elif drink_thomas_shots < 1000 %}3{% else %}4{% endif %}" data-drink-metric="t-s">
         <img
           class="play-drink-metric__icon play-drink-metric__icon--fire"
-          src="{{ MEDIA_URL }}fire-cocktail.png"
+          src="{% static 'myapp/img/fire-cocktail.png' %}"
           alt=""
           width="36"
           height="36"

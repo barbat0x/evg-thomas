@@ -1,4 +1,4 @@
-Django>=6.0,<7
+Django==6.0.5
 psycopg[binary]>=3.2,<4
 Pillow>=10,<12
 gunicorn==26.0.0

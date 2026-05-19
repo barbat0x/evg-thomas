@@ -17,8 +17,22 @@ Comme [l’étape 1 du tutoriel](https://medium.com/django-unleashed/complete-tu
 
 ```bash
 cd /chemin/vers/evg-thomas
-python3 -m venv venv
+python3.12 -m venv venv   # ou python3 si déjà >= 3.12
 source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Sur un VPS Ubuntu ancien, le `python3` par défaut peut être 3.8 ou 3.10 : dans ce cas `pip` ne trouvera pas Django 6 (erreur du type *No matching distribution found for Django==6.x*). Installer Python 3.12 puis recréer le venv :
+
+```bash
+sudo apt update
+sudo apt install -y python3.12 python3.12-venv python3.12-dev
+cd /chemin/vers/evg-thomas
+rm -rf venv
+python3.12 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 

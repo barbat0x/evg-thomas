@@ -9,7 +9,7 @@
 </head>
 <body class="compose-body">
   <header class="compose-header">
-    <a href="{% url 'setup' %}" class="compose-back">← Préparation</a>
+    <a href="{% url 'home' %}" class="compose-back">← Accueil</a>
     <h1 class="compose-title">Créer les deux équipes de troubadour</h1>
   </header>
 
@@ -22,7 +22,7 @@
   {% endif %}
 
   {% if not has_participants %}
-  <p class="compose-empty">Aucun participant en base : créez-en depuis la <a href="{% url 'setup' %}">préparation</a>.</p>
+  <p class="compose-empty">Aucun participant en base : <a href="{% url 'admin:myapp_participant_add' %}">ajoutez-en dans l’admin</a>.</p>
   {% else %}
   <form
     class="compose-form"

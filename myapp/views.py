@@ -6,19 +6,12 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F, Max, Prefetch
+from django.db.models import F, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from myapp import play_helpers
-from myapp.forms import (
-    GameForm,
-    ParticipantForm,
-    TeamForm,
-    TeamMemberAddForm,
-    TeamMemberForm,
-)
 from myapp.models import (
     AnswerMode,
     Game,
@@ -29,18 +22,6 @@ from myapp.models import (
     TeamMember,
 )
 
-ACTION_ADD_PARTICIPANT = 'add_participant'
-ACTION_ADD_TEAM = 'add_team'
-ACTION_ADD_TEAM_MEMBER = 'add_team_member'
-ACTION_ADD_TEAM_MEMBER_PAGE = 'add_member'
-ACTION_REMOVE_TEAM_MEMBER = 'remove_member'
-ACTION_MOVE_MEMBER_UP = 'move_up'
-ACTION_MOVE_MEMBER_DOWN = 'move_down'
-ACTION_ADD_GAME = 'add_game'
-ACTION_CREATE_AND_PLAY = 'create_and_play'
-ACTION_START_GAME = 'start_game'
-ACTION_START_AND_PLAY = 'start_and_play'
-ACTION_FINISH_GAME = 'finish_game'
 ACTION_COMPOSE_SAVE_START = 'save_and_start'
 ERROR_PREFIX = 'Corrigez le formulaire : '
 
@@ -179,51 +160,6 @@ def _play_render(
     return render(request, 'myapp/play.html', ctx)
 
 
-def _move_membership(team_id: int, membership_id: int, delta: int) -> bool:
-    rows = list(
-        TeamMember.objects.filter(team_id=team_id).order_by('sort_order', 'pk'),
-    )
-    ids = [r.pk for r in rows]
-    try:
-        idx = ids.index(membership_id)
-    except ValueError:
-        return False
-    j = idx + delta
-    if j < 0 or j >= len(rows):
-        return False
-    a, b = rows[idx], rows[j]
-    a.sort_order, b.sort_order = b.sort_order, a.sort_order
-    TeamMember.objects.bulk_update([a, b], ['sort_order'])
-    return True
-
-
-def _base_context():
-    return {
-        'participant_form': ParticipantForm(),
-        'team_form': TeamForm(),
-        'team_member_form': TeamMemberForm(),
-        'game_form': GameForm(),
-        'participants': Participant.objects.all(),
-        'teams': Team.objects.prefetch_related(
-            Prefetch(
-                'memberships',
-                queryset=TeamMember.objects.select_related('participant').order_by(
-                    'sort_order',
-                    'pk',
-                ),
-            ),
-        ),
-        'games': Game.objects.select_related('team_a', 'team_b')
-        .prefetch_related(
-            Prefetch(
-                'scores_by_team',
-                queryset=GameTeamScore.objects.select_related('team'),
-            ),
-        )
-        .order_by('-created_at'),
-    }
-
-
 @staff_member_required(login_url='/admin/login/')
 def home(request):
     rng = random.Random()
@@ -285,262 +221,13 @@ def home(request):
 @staff_member_required(login_url='/admin/login/')
 def begin_party(request):
     """Crée une partie en préparation (2 équipes) et ouvre la composition."""
-    teams = list(Team.objects.order_by('name')[:2])
-    if len(teams) < 2:
-        messages.info(
-            request,
-            'Créez au moins deux équipes depuis la préparation pour lancer une partie.',
-        )
-        return redirect('setup')
+    teams = list(Team.objects.order_by('pk')[:2])
+    while len(teams) < 2:
+        n = len(teams) + 1
+        teams.append(Team.objects.create(name=f'Équipe {n}'))
     team_a, team_b = teams[0], teams[1]
     game = Game.objects.create(team_a=team_a, team_b=team_b)
     return redirect('compose_game', pk=game.pk)
-
-
-@staff_member_required(login_url='/admin/login/')
-def setup_dashboard(request):
-    context = _base_context()
-
-    if request.method == 'POST':
-        action = request.POST.get('action')
-
-        if action == ACTION_ADD_PARTICIPANT:
-            form = ParticipantForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Participant enregistré.')
-                return redirect('setup')
-            context['participant_form'] = form
-            messages.error(
-                request,
-                ERROR_PREFIX + form.errors.as_text(),
-            )
-
-        elif action == ACTION_ADD_TEAM:
-            form = TeamForm(request.POST)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Équipe créée.')
-                return redirect('setup')
-            context['team_form'] = form
-            messages.error(request, ERROR_PREFIX + form.errors.as_text())
-
-        elif action == ACTION_ADD_TEAM_MEMBER:
-            form = TeamMemberForm(request.POST)
-            if form.is_valid():
-                membership = form.save(commit=False)
-                max_order = TeamMember.objects.filter(
-                    team_id=membership.team_id,
-                ).aggregate(m=Max('sort_order'))['m']
-                membership.sort_order = 0 if max_order is None else max_order + 1
-                membership.save()
-                messages.success(request, 'Participant ajouté à l’équipe.')
-                return redirect('setup')
-            context['team_member_form'] = form
-            messages.error(request, ERROR_PREFIX + form.errors.as_text())
-
-        elif action == ACTION_ADD_GAME:
-            form = GameForm(request.POST)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Partie créée (préparation).')
-                return redirect('setup')
-            context['game_form'] = form
-            messages.error(request, ERROR_PREFIX + form.errors.as_text())
-
-        elif action == ACTION_CREATE_AND_PLAY:
-            form = GameForm(request.POST)
-            if form.is_valid():
-                game = form.save()
-                return redirect('compose_game', pk=game.pk)
-            context['game_form'] = form
-            messages.error(request, ERROR_PREFIX + form.errors.as_text())
-
-        elif action == ACTION_START_GAME:
-            try:
-                game = Game.objects.get(pk=request.POST.get('game_id'))
-            except (Game.DoesNotExist, TypeError, ValueError):
-                messages.error(request, 'Partie introuvable.')
-                return redirect('setup')
-            try:
-                game.start()
-            except ValidationError as e:
-                messages.error(request, _format_validation_error(e))
-            else:
-                messages.success(request, 'Partie démarrée.')
-            return redirect('setup')
-
-        elif action == ACTION_START_AND_PLAY:
-            try:
-                game = Game.objects.get(pk=request.POST.get('game_id'))
-            except (Game.DoesNotExist, TypeError, ValueError):
-                messages.error(request, 'Partie introuvable.')
-                return redirect('setup')
-            if game.status != GameStatus.PREPARATION:
-                messages.error(
-                    request,
-                    'Seule une partie en préparation peut être composée ainsi.',
-                )
-                return redirect('setup')
-            return redirect('compose_game', pk=game.pk)
-
-        elif action == ACTION_FINISH_GAME:
-            try:
-                game = Game.objects.get(pk=request.POST.get('game_id'))
-            except (Game.DoesNotExist, TypeError, ValueError):
-                messages.error(request, 'Partie introuvable.')
-                return redirect('setup')
-            try:
-                game.finish()
-            except ValidationError as e:
-                messages.error(request, _format_validation_error(e))
-            else:
-                messages.success(request, 'Partie terminée.')
-            return redirect('setup')
-
-        else:
-            messages.error(request, 'Action non reconnue.')
-            return redirect('setup')
-
-    return render(request, 'myapp/setup.html', context)
-
-
-@staff_member_required(login_url='/admin/login/')
-def edit_participant(request, pk: int):
-    participant = get_object_or_404(Participant, pk=pk)
-    if request.method == 'POST':
-        form = ParticipantForm(request.POST, request.FILES, instance=participant)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Participant mis à jour.')
-            return redirect('setup')
-        messages.error(request, ERROR_PREFIX + form.errors.as_text())
-    else:
-        form = ParticipantForm(instance=participant)
-    return render(
-        request,
-        'myapp/setup_participant_edit.html',
-        {'form': form, 'participant': participant},
-    )
-
-
-@staff_member_required(login_url='/admin/login/')
-def edit_team(request, pk: int):
-    team = get_object_or_404(Team, pk=pk)
-    if request.method == 'POST':
-        form = TeamForm(request.POST, instance=team)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Équipe mise à jour.')
-            return redirect('setup')
-        messages.error(request, ERROR_PREFIX + form.errors.as_text())
-    else:
-        form = TeamForm(instance=team)
-    return render(
-        request,
-        'myapp/setup_team_edit.html',
-        {'form': form, 'team': team},
-    )
-
-
-@staff_member_required(login_url='/admin/login/')
-def manage_team_members(request, pk: int):
-    team = get_object_or_404(Team, pk=pk)
-    redirect_target = redirect('manage_team_members', pk=team.pk)
-
-    if request.method == 'POST':
-        action = request.POST.get('action')
-
-        if action == ACTION_ADD_TEAM_MEMBER_PAGE:
-            form = TeamMemberAddForm(
-                request.POST,
-                team=team,
-            )
-            if form.is_valid():
-                membership = form.save(commit=False)
-                membership.team = team
-                max_order = TeamMember.objects.filter(team_id=team.pk).aggregate(
-                    m=Max('sort_order'),
-                )['m']
-                membership.sort_order = 0 if max_order is None else max_order + 1
-                membership.save()
-                messages.success(request, 'Participant ajouté à l’équipe.')
-                return redirect_target
-            messages.error(request, ERROR_PREFIX + form.errors.as_text())
-            memberships = list(
-                team.memberships.select_related('participant').order_by(
-                    'sort_order',
-                    'pk',
-                ),
-            )
-            return render(
-                request,
-                'myapp/setup_team_members.html',
-                {
-                    'team': team,
-                    'memberships': memberships,
-                    'add_form': form,
-                    'can_add_member': form.fields['participant'].queryset.exists(),
-                },
-            )
-
-        elif action == ACTION_REMOVE_TEAM_MEMBER:
-            try:
-                mid = int(request.POST.get('membership_id', ''))
-            except (TypeError, ValueError):
-                messages.error(request, 'Membre invalide.')
-                return redirect_target
-            deleted, _ = TeamMember.objects.filter(
-                pk=mid,
-                team_id=team.pk,
-            ).delete()
-            if deleted:
-                messages.success(request, 'Participant retiré de l’équipe.')
-            else:
-                messages.error(request, 'Impossible de retirer ce membre.')
-
-        elif action == ACTION_MOVE_MEMBER_UP:
-            try:
-                mid = int(request.POST.get('membership_id', ''))
-            except (TypeError, ValueError):
-                messages.error(request, 'Membre invalide.')
-                return redirect_target
-            if _move_membership(team.pk, mid, -1):
-                messages.success(request, 'Ordre mis à jour.')
-            else:
-                messages.error(request, 'Déplacement impossible.')
-
-        elif action == ACTION_MOVE_MEMBER_DOWN:
-            try:
-                mid = int(request.POST.get('membership_id', ''))
-            except (TypeError, ValueError):
-                messages.error(request, 'Membre invalide.')
-                return redirect_target
-            if _move_membership(team.pk, mid, +1):
-                messages.success(request, 'Ordre mis à jour.')
-            else:
-                messages.error(request, 'Déplacement impossible.')
-
-        else:
-            messages.error(request, 'Action non reconnue.')
-
-        return redirect_target
-
-    memberships = list(
-        team.memberships.select_related('participant').order_by('sort_order', 'pk'),
-    )
-    add_form = TeamMemberAddForm(team=team)
-    can_add_member = add_form.fields['participant'].queryset.exists()
-    return render(
-        request,
-        'myapp/setup_team_members.html',
-        {
-            'team': team,
-            'memberships': memberships,
-            'add_form': add_form,
-            'can_add_member': can_add_member,
-        },
-    )
 
 
 def _parse_participant_id_list(raw: str) -> list[int]:
@@ -567,7 +254,7 @@ def compose_game(request, pk: int):
             request,
             'Cette partie n’est plus en préparation : composition impossible.',
         )
-        return redirect('setup')
+        return redirect('home')
 
     if request.method == 'POST':
         if request.POST.get('action') != ACTION_COMPOSE_SAVE_START:
@@ -752,11 +439,11 @@ def play_game(request, pk: int):
     if game.status != GameStatus.IN_PROGRESS:
         messages.error(
             request,
-            'Cette partie n’est pas en cours. Démarrez-la depuis la préparation.',
+            'Cette partie n’est pas en cours. Composez les équipes depuis l’accueil.',
         )
         if _play_wants_partial(request):
-            return JsonResponse({'redirect': reverse('setup')})
-        return redirect('setup')
+            return JsonResponse({'redirect': reverse('home')})
+        return redirect('home')
 
     mode_key = play_helpers.play_mode_session_key(pk)
     duo_key = play_helpers.play_duo_order_session_key(pk)
