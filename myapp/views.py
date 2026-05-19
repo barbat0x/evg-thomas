@@ -224,6 +224,7 @@ def _base_context():
     }
 
 
+@staff_member_required(login_url='/admin/login/')
 def home(request):
     rng = random.Random()
     stars = []
