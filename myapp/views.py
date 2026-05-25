@@ -130,6 +130,13 @@ def _play_assemble_active_context(
         choice_rows = play_helpers.build_choice_rows(question, [0, 1, 2, 3])
     game.refresh_from_db()
     idx = game.play_question_index
+    q10_ctx = play_helpers.play_q10_template_context(request, game, pk)
+    if q10_ctx.get('play_cash_only') and mode in (AnswerMode.DUO, AnswerMode.CARRE):
+        mode = None
+        choice_rows = []
+        request.session.pop(mode_key, None)
+        request.session.pop(duo_key, None)
+        request.session.modified = True
     return {
         'game': game,
         'question': question,
@@ -141,6 +148,7 @@ def _play_assemble_active_context(
         'choice_rows': choice_rows,
         'play_finished': False,
         'play_no_questions': False,
+        **q10_ctx,
     }
 
 
@@ -149,13 +157,21 @@ def _play_render(
     ctx: dict,
     *,
     answer_verdict: str | None = None,
+    swap_scope: str | None = None,
 ):
     ctx['play_document_title'] = _play_document_title(ctx)
     if _play_wants_partial(request):
-        resp = render(request, 'myapp/_play_live.html', ctx)
+        template = (
+            'myapp/_play_partial_center.html'
+            if swap_scope == 'center'
+            else 'myapp/_play_live.html'
+        )
+        resp = render(request, template, ctx)
         resp.headers['X-Play-Title'] = ctx['play_document_title']
         if answer_verdict in ('correct', 'wrong'):
             resp.headers['X-Play-Answer-Verdict'] = answer_verdict
+        if swap_scope:
+            resp.headers['X-Play-Swap-Scope'] = swap_scope
         return resp
     return render(request, 'myapp/play.html', ctx)
 
@@ -450,13 +466,84 @@ def play_game(request, pk: int):
 
     if request.method == 'POST':
         post_action = request.POST.get('action')
+
+        if post_action == 'q10_roulette_ack':
+            branch = play_helpers.ensure_q10_branch(request.session, pk, game)
+            if (
+                branch
+                and game.play_question_index == play_helpers.Q10_QUESTION_INDEX
+            ):
+                request.session[
+                    play_helpers.play_q10_roulette_done_session_key(pk)
+                ] = True
+                request.session.modified = True
+            return _play_render(request, _active_page(), swap_scope='full')
+
+        if post_action == 'q10_anecdote_split':
+            branch = play_helpers.q10_branch_from_session(request.session, pk)
+            if (
+                branch == play_helpers.Q10_BRANCH_ANECDOTE
+                and game.play_question_index == play_helpers.Q10_QUESTION_INDEX
+                and request.session.get(
+                    play_helpers.play_q10_roulette_done_session_key(pk),
+                )
+            ):
+                team_side = (request.POST.get('team_side') or '').strip().lower()
+                validated = (request.POST.get('validated') or '').strip().lower()
+                if team_side in ('a', 'b') and validated in ('yes', 'no'):
+                    if validated == 'yes':
+                        target = game.team_a if team_side == 'a' else game.team_b
+                        try:
+                            game.apply_anecdote_shot_split(target)
+                        except ValidationError as e:
+                            messages.error(request, _format_validation_error(e))
+                            return _play_render(request, _active_page())
+                    request.session[
+                        play_helpers.play_q10_anecdote_done_session_key(pk)
+                    ] = True
+                    request.session.modified = True
+                else:
+                    messages.error(
+                        request,
+                        'Indiquez l’équipe visée et si l’anecdote a fait rire.',
+                    )
+            return _play_render(
+                request,
+                _active_page(),
+                swap_scope='full',
+            )
+
+        q10_ctx = play_helpers.play_q10_template_context(request, game, pk)
+        if q10_ctx.get('play_q10_show_roulette') or q10_ctx.get(
+            'play_q10_show_anecdote',
+        ):
+            return _play_render(request, _active_page(), swap_scope='full')
+
         if post_action == 'choose_mode':
             mode = request.POST.get('mode')
             if mode not in AnswerMode.values:
                 messages.error(request, 'Mode de jeu invalide.')
-                return _play_render(request, _active_page())
+                return _play_render(
+                    request,
+                    _active_page(),
+                    swap_scope='center',
+                )
             request.session[mode_key] = mode
             question = questions[game.play_question_index]
+            if play_helpers.is_cash_only_question(
+                game.play_question_index,
+                q10_ctx.get('play_q10_branch'),
+            ) and mode != AnswerMode.CASH:
+                messages.error(
+                    request,
+                    'Questions 11 à 14 : mode Cash uniquement.',
+                )
+                request.session.pop(mode_key, None)
+                return _play_render(
+                    request,
+                    _active_page(),
+                    swap_scope='center',
+                )
             if mode == AnswerMode.DUO:
                 request.session[duo_key] = play_helpers.duo_display_order(
                     game,
@@ -465,7 +552,11 @@ def play_game(request, pk: int):
                 )
             else:
                 request.session.pop(duo_key, None)
-            return _play_render(request, _active_page())
+            return _play_render(
+                request,
+                _active_page(),
+                swap_scope='center',
+            )
 
         if post_action == 'answer':
             mode = request.session.get(mode_key)
@@ -478,6 +569,21 @@ def play_game(request, pk: int):
 
             question = questions[game.play_question_index]
             team = game.team_for_turn
+
+            if (
+                play_helpers.is_cash_only_question(
+                    game.play_question_index,
+                    q10_ctx.get('play_q10_branch'),
+                )
+                and mode != AnswerMode.CASH
+            ):
+                request.session.pop(mode_key, None)
+                request.session.pop(duo_key, None)
+                messages.error(
+                    request,
+                    'Questions 11 à 14 : mode Cash uniquement.',
+                )
+                return _play_render(request, _active_page())
 
             if mode == AnswerMode.CASH:
                 verdict_raw = (request.POST.get('cash_verdict') or '').strip().lower()
@@ -564,10 +670,26 @@ def play_game(request, pk: int):
                     'play_message': 'Manche terminée.',
                 }
                 v = 'correct' if answer_was_correct else 'wrong'
-                return _play_render(request, ctx, answer_verdict=v)
+                return _play_render(
+                    request,
+                    ctx,
+                    answer_verdict=v,
+                    swap_scope='patch',
+                )
 
             v = 'correct' if answer_was_correct else 'wrong'
-            return _play_render(request, _active_page(), answer_verdict=v)
+            page_ctx = _active_page()
+            scope = (
+                'full'
+                if play_helpers.play_q10_needs_overlay(page_ctx)
+                else 'patch'
+            )
+            return _play_render(
+                request,
+                page_ctx,
+                answer_verdict=v,
+                swap_scope=scope,
+            )
 
         return _play_render(request, _active_page())
 

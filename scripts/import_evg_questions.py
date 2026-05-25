@@ -39,13 +39,8 @@ SHEET_CSV_URL = (
 )
 
 # Jeu intégré : textes relus (orthographe / grammaire légère), index 0-based.
+# Ordre volontaire : Q11–14 = projet bac, lieu de naissance, 1er rdv Chloé, 1er sport.
 BUILTIN_QUESTIONS: list[dict[str, object]] = [
-    {
-        'text': 'Quel est le premier sport que Thomas a pratiqué ?',
-        'choices': ['Judo', "Tire à l'arc", 'Foot', 'Badminton'],
-        'correct': 0,
-        'duo': 2,
-    },
     {
         'text': (
             'Qui, parmi les personnes présentes ici, Thomas a-t-il rencontré en premier ?'
@@ -74,7 +69,7 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
     {
         'text': 'Quel était le nom du premier chien de Thomas ?',
         'choices': ['Tsuki', 'Prisca', 'Cannelle', 'Cassis'],
-        'correct': 1,
+        'correct': 2,
         'duo': 3,
     },
     {
@@ -87,17 +82,6 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
         'text': "Quel écart d'âge Thomas a-t-il avec son frère ?",
         'choices': ['5 ans', '6 ans', '7 ans', '8 ans'],
         'correct': 2,
-        'duo': 1,
-    },
-    {
-        'text': 'Quel projet a-t-il réalisé au bac ?',
-        'choices': [
-            'Thermomètre Bluetooth',
-            'Éclairage intelligent',
-            'Ascenseur miniature',
-            'Mini-robot mobile',
-        ],
-        'correct': 3,
         'duo': 1,
     },
     {
@@ -130,15 +114,15 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
         'duo': 2,
     },
     {
-        'text': 'Le dimanche, c’est…',
+        'text': 'Quel projet a-t-il réalisé au bac ?',
         'choices': [
-            'Gaming et tacos',
-            'Lecture et pizza',
-            'Netflix et sushi',
-            'Puzzle et McDo',
+            'Thermomètre Bluetooth',
+            'Éclairage intelligent',
+            'Ascenseur miniature',
+            'Mini-robot mobile',
         ],
-        'correct': 2,
-        'duo': 0,
+        'correct': 3,
+        'duo': 1,
     },
     {
         'text': 'Où est né Thomas ?',
@@ -150,6 +134,34 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
         ],
         'correct': 2,
         'duo': 1,
+    },
+    {
+        'text': 'Quel a été le premier date avec Chloé ?',
+        'choices': [
+            'Dîner péniche sur la Seine',
+            'Kebab',
+            'Gaufre maison pour la Saint-Valentin',
+            'Avengers en 4D après une soirée',
+        ],
+        'correct': 2,
+        'duo': 3,
+    },
+    {
+        'text': 'Quel est le premier sport que Thomas a pratiqué ?',
+        'choices': ['Judo', "Tire à l'arc", 'Foot', 'Badminton'],
+        'correct': 0,
+        'duo': 2,
+    },
+    {
+        'text': 'Le dimanche, c’est…',
+        'choices': [
+            'Gaming et tacos',
+            'Lecture et pizza',
+            'Netflix et sushi',
+            'Puzzle et McDo',
+        ],
+        'correct': 2,
+        'duo': 0,
     },
     {
         'text': 'À quel âge Thomas a-t-il eu sa première fois ?',
@@ -188,17 +200,6 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
             'Les blagues racistes du beau-père',
         ],
         'correct': 0,
-        'duo': 3,
-    },
-    {
-        'text': 'Quel a été le premier rendez-vous avec Chloé ?',
-        'choices': [
-            'Dîner péniche sur la Seine',
-            'Kebab',
-            'Gaufre maison pour la Saint-Valentin',
-            'Avengers en 4D après une soirée',
-        ],
-        'correct': 2,
         'duo': 3,
     },
     {

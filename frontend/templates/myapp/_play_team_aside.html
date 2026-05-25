@@ -1,5 +1,6 @@
 <aside
   class="play-side play-side--{{ side }}{% if current_team and current_team.pk == team.pk %} play-side--active-turn{% endif %}"
+  data-play-team-aside="{{ side }}"
   aria-label="{{ team.name }}"
 >
   <h2 class="play-team-name">{{ team.name }}</h2>

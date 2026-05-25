@@ -1,0 +1,32 @@
+<div class="play-q10-overlay" role="dialog" aria-modal="true" aria-labelledby="play-q10-roulette-title">
+  <div class="play-q10-panel play-q10-panel--roulette">
+    <div class="play-q10-roulette" aria-hidden="true">
+      <div
+        class="play-q10-roulette__wheel"
+        data-play-q10-wheel
+        data-play-q10-outcome="{{ play_q10_branch }}">
+        <ul class="play-q10-roulette__labels" aria-hidden="true">
+          <li class="play-q10-roulette__label" style="--i: 0"><span>Cash<br>forcé</span></li>
+          <li class="play-q10-roulette__label" style="--i: 1"><span>Anecdote</span></li>
+          <li class="play-q10-roulette__label" style="--i: 2"><span>Gorgées</span></li>
+          <li class="play-q10-roulette__label" style="--i: 3"><span>Cash</span></li>
+          <li class="play-q10-roulette__label" style="--i: 4"><span>Anecdote !</span></li>
+          <li class="play-q10-roulette__label" style="--i: 5"><span>Shot<br>bonus</span></li>
+          <li class="play-q10-roulette__label" style="--i: 6"><span>Mode<br>libre</span></li>
+          <li class="play-q10-roulette__label" style="--i: 7"><span>Suspense</span></li>
+        </ul>
+        <div class="play-q10-roulette__hub"></div>
+      </div>
+      <div class="play-q10-roulette__pointer"></div>
+    </div>
+    <div class="play-q10-result" data-play-q10-result hidden>
+      <h2 class="play-q10-result__title" id="play-q10-roulette-title">{{ play_q10_roulette_title }}</h2>
+      <p class="play-q10-result__detail">{{ play_q10_roulette_detail }}</p>
+      <form method="post" class="play-q10-ack-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="q10_roulette_ack">
+        <button type="submit" class="play-btn play-btn-mode play-q10-continue">Continuer</button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -100,6 +100,8 @@
   /* Ne pas étirer sur toute la largeur du .play-shell (évite gorgées / shots collés aux bords). */
   align-self: center;
   max-width: 100%;
+  contain: layout style paint;
+  isolation: isolate;
 }
 
 .play-thomas-strip .play-top-photo,
@@ -282,6 +284,8 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  min-height: 1.15em;
 }
 
 .play-column--a .play-team-drink__score {
@@ -304,11 +308,32 @@
 
 /* Colonne équipe : compteur + rangée boisson / encart */
 .play-column {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0.45rem;
   min-width: 0;
+  width: 100%;
+  align-self: start;
+  padding: 0.5rem 0.65rem 0.55rem;
+  border-radius: 24px;
+  contain: layout style;
+}
+
+.play-column::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+
+.play-column > * {
+  position: relative;
+  z-index: 1;
 }
 
 .play-column__row {
@@ -331,6 +356,7 @@
   margin: 0;
   padding: 0 0.15rem;
   text-align: center;
+  min-height: 3.15rem;
 }
 
 .play-column-progress__main {
@@ -350,6 +376,7 @@
   color: var(--play-text);
   line-height: 1.3;
   opacity: 0.92;
+  min-height: 1.05rem;
 }
 
 .play-column-turn-badge {
@@ -374,6 +401,15 @@
     0 1px 0 rgba(255, 255, 255, 0.4) inset;
   text-shadow: 0 1px 0 rgba(13, 58, 92, 0.25);
   white-space: nowrap;
+}
+
+.play-column-badge-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  margin: 0;
+  padding: 0;
 }
 
 .play-column-turn-badge--b {
@@ -430,13 +466,13 @@
   }
 }
 
-/* Colonne dont c’est le tour : halo fort + pastille (lisible de loin) */
+/* Colonne dont c’est le tour : halo via ::before (sans padding / marge variables) */
 .play-column--active-turn {
-  position: relative;
   z-index: 1;
-  padding: 0.5rem 0.65rem 0.55rem;
-  margin: -0.85rem -0.65rem -0.55rem;
-  border-radius: 24px;
+}
+
+.play-column--active-turn::before {
+  opacity: 1;
   background:
     linear-gradient(
       155deg,
@@ -453,7 +489,7 @@
   animation: play-active-turn-glow 2.4s ease-in-out infinite;
 }
 
-.play-column--b.play-column--active-turn {
+.play-column--b.play-column--active-turn::before {
   background:
     linear-gradient(
       205deg,
@@ -486,7 +522,6 @@
 }
 
 .play-column--active-turn .play-team-name {
-  font-size: clamp(1.08rem, 3vw, 1.45rem);
   text-shadow:
     0 0 24px rgba(77, 163, 255, 0.55),
     0 1px 0 rgba(255, 255, 255, 0.9);
@@ -566,7 +601,7 @@
   padding: 0 clamp(0.75rem, 2.5vw, 1.5rem) 1rem;
   max-width: 100rem;
   margin: 0 auto;
-  align-items: center;
+  align-items: start;
   align-content: start;
   overflow-x: clip;
   width: 100%;
@@ -635,20 +670,13 @@
 }
 
 .play-side--active-turn {
-  border-width: 2px;
   border-color: rgba(77, 163, 255, 0.55);
-  border-left-width: 7px;
-  border-left-color: var(--play-zone-a);
   box-shadow:
     0 0 0 2px rgba(77, 163, 255, 0.2),
     0 8px 26px rgba(77, 163, 255, 0.15);
 }
 
 .play-side--b.play-side--active-turn {
-  border-right-width: 7px;
-  border-right-color: var(--play-zone-b);
-  border-left-width: 1px;
-  border-left-color: var(--play-border);
   border-color: rgba(92, 225, 197, 0.55);
   box-shadow:
     0 0 0 2px rgba(92, 225, 197, 0.2),
@@ -678,6 +706,7 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.15rem;
+  contain: layout style paint;
 }
 
 .play-photo-wrap {
@@ -925,6 +954,29 @@
   padding: clamp(0.35rem, 2vw, 0.85rem) 0;
   text-align: center;
   margin-top: calc(-1 * clamp(0.9rem, 5vh, 2.7rem));
+  align-self: start;
+}
+
+.play-center__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  /* Réserve la hauteur du mode Carré (2×2), le plus grand des états. */
+  min-height: clamp(14.5rem, 40vh, 23rem);
+}
+
+.play-center--has-mode .play-hint {
+  visibility: hidden;
+}
+
+.play-hint {
+  margin: 0 0 1rem;
+  color: var(--play-muted);
+  font-size: 0.98rem;
+  min-height: 1.45rem;
+  flex-shrink: 0;
 }
 
 .play-center--centered {
@@ -988,12 +1040,6 @@
 
 .play-result strong {
   color: #0d4a7a;
-}
-
-.play-hint {
-  margin: 0 0 1rem;
-  color: var(--play-muted);
-  font-size: 0.98rem;
 }
 
 .play-modes {
@@ -1288,14 +1334,10 @@
   min-width: 0;
   max-width: min(40rem, 100%);
   margin: 0 auto;
-  padding: clamp(1rem, 3vw, 1.35rem);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--play-border);
-  box-shadow:
-    0 4px 18px rgba(13, 58, 92, 0.07),
-    0 0 0 3px rgba(77, 163, 255, 0.14),
-    0 0 0 5px rgba(92, 225, 197, 0.12);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .play-cash-form {
@@ -1327,7 +1369,7 @@
   padding: 1.05rem 1.35rem;
   color: #fff;
   cursor: pointer;
-  border: 2px dashed rgba(255, 255, 255, 0.65);
+  border: 2px solid rgba(13, 58, 92, 0.22);
   transition:
     transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
     box-shadow 0.22s ease,
@@ -1574,6 +1616,231 @@
   line-height: 1.5;
 }
 
+.play-hint--cash-only {
+  color: var(--play-text);
+  font-weight: 600;
+}
+
+.play-modes--cash-only {
+  justify-content: center;
+}
+
+.play-modes--cash-only .play-mode-form {
+  flex: 0 1 auto;
+}
+
+/* --- Question 10 : roulette / anecdote --- */
+
+.play-q10-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: rgba(13, 58, 92, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.play-q10-panel {
+  width: min(100%, 26rem);
+  padding: 1.5rem 1.35rem;
+  border-radius: 18px;
+  background: var(--play-card-solid);
+  border: 1px solid var(--play-border);
+  box-shadow: 0 18px 48px rgba(13, 58, 92, 0.22);
+  text-align: center;
+}
+
+.play-q10-panel--roulette {
+  width: fit-content;
+  max-width: min(98vw, 44rem);
+  padding: clamp(0.85rem, 2vmin, 1.25rem);
+}
+
+.play-q10-panel--anecdote {
+  text-align: left;
+}
+
+.play-q10-roulette {
+  position: relative;
+  width: min(92vmin, 40rem);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.play-q10-roulette__wheel {
+  container-type: size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    var(--play-zone-a) 0deg 45deg,
+    #ff6b6b 45deg 90deg,
+    #ffd166 90deg 135deg,
+    #1976d2 135deg 180deg,
+    #e85d75 180deg 225deg,
+    #ff9f43 225deg 270deg,
+    var(--play-zone-b) 270deg 315deg,
+    #a78bfa 315deg 360deg
+  );
+  border: clamp(5px, 1.2vmin, 8px) solid var(--play-text);
+  box-shadow:
+    inset 0 0 0 clamp(6px, 1.5vmin, 10px) rgba(255, 255, 255, 0.38),
+    0 8px 28px rgba(13, 58, 92, 0.22);
+  transform: rotate(0deg);
+  will-change: transform;
+}
+
+.play-q10-roulette__labels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Chaque label couvre le disque et pivote sur le centre du segment. */
+.play-q10-roulette__label {
+  position: absolute;
+  inset: 0;
+  transform: rotate(calc((var(--i) * 45deg) + 22.5deg));
+}
+
+/* Texte à ~64 % du rayon, centré dans la portion de camembert. */
+.play-q10-roulette__label span {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 32%);
+  transform: translate(-50%, -50%) rotate(90deg);
+  display: block;
+  width: max-content;
+  max-width: 13cqi;
+  font-size: clamp(0.9rem, 4.8cqi, 1.35rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #fff;
+  text-shadow:
+    0 1px 0 rgba(13, 58, 92, 0.7),
+    0 2px 8px rgba(13, 58, 92, 0.5);
+  white-space: normal;
+}
+
+.play-q10-roulette__hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(2.5rem, 12cqi, 4rem);
+  height: clamp(2.5rem, 12cqi, 4rem);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--play-card-solid);
+  border: clamp(3px, 0.8vmin, 5px) solid var(--play-text);
+  box-shadow: 0 3px 12px rgba(13, 58, 92, 0.22);
+  z-index: 2;
+}
+
+.play-q10-roulette__pointer {
+  position: absolute;
+  top: clamp(-0.65rem, -2vmin, -0.85rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: clamp(0.85rem, 3.5vmin, 1.25rem) solid transparent;
+  border-right: clamp(0.85rem, 3.5vmin, 1.25rem) solid transparent;
+  border-top: clamp(1.5rem, 5vmin, 2.25rem) solid var(--play-text);
+  filter: drop-shadow(0 3px 4px rgba(13, 58, 92, 0.3));
+  z-index: 3;
+}
+
+.play-q10-panel--roulette .play-q10-result {
+  margin-top: clamp(1rem, 3vmin, 1.5rem);
+}
+
+.play-q10-result__title {
+  margin: 0 0 0.65rem;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.play-q10-result__detail {
+  margin: 0 0 1.15rem;
+  color: var(--play-muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.play-q10-ack-form,
+.play-q10-anecdote-form {
+  margin: 0;
+}
+
+.play-q10-panel--roulette .play-q10-ack-form {
+  display: flex;
+  justify-content: center;
+}
+
+.play-q10-continue {
+  width: 100%;
+  max-width: 14rem;
+}
+
+.play-q10-panel--roulette .play-q10-continue {
+  width: auto;
+  min-width: 10.5rem;
+  margin: 0;
+}
+
+.play-q10-panel--anecdote .play-q10-continue {
+  display: block;
+  margin: 0.5rem auto 0;
+}
+
+.play-q10-fieldset {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.play-q10-fieldset__legend {
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 0.45rem;
+}
+
+.play-q10-team-pick,
+.play-q10-validated-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.play-q10-team-option,
+.play-q10-validated-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--play-border);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.play-q10-team-option:has(input:checked),
+.play-q10-validated-option:has(input:checked) {
+  border-color: var(--play-zone-a);
+  background: rgba(77, 163, 255, 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .play-btn-mode,
   .play-btn-mode::before,
@@ -1584,8 +1851,8 @@
     animation: none !important;
   }
 
-  .play-column--active-turn,
-  .play-column--b.play-column--active-turn {
+  .play-column--active-turn::before,
+  .play-column--b.play-column--active-turn::before {
     animation: none !important;
   }
 

@@ -1,0 +1,41 @@
+<div class="play-q10-overlay" role="dialog" aria-modal="true" aria-labelledby="play-q10-anecdote-title">
+  <div class="play-q10-panel play-q10-panel--anecdote">
+    <h2 class="play-q10-result__title" id="play-q10-anecdote-title">Anecdote de Thomas</h2>
+    <p class="play-q10-result__detail">
+      Thomas raconte une anecdote sur quelqu’un.
+      Si la majorité trouve ça drôle, il partage ses shots avec l’équipe de la personne visée
+      (moitié pour Thomas, moitié pour l’équipe).
+    </p>
+    <form method="post" class="play-q10-anecdote-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="q10_anecdote_split">
+      <fieldset class="play-q10-fieldset">
+        <legend class="play-q10-fieldset__legend">Personne visée — équipe</legend>
+        <div class="play-q10-team-pick">
+          <label class="play-q10-team-option">
+            <input type="radio" name="team_side" value="a" required>
+            <span>{{ game.team_a.name }}</span>
+          </label>
+          <label class="play-q10-team-option">
+            <input type="radio" name="team_side" value="b" required>
+            <span>{{ game.team_b.name }}</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset class="play-q10-fieldset">
+        <legend class="play-q10-fieldset__legend">La majorité a-t-elle ri ?</legend>
+        <div class="play-q10-validated-pick">
+          <label class="play-q10-validated-option">
+            <input type="radio" name="validated" value="yes" required>
+            <span>Oui — split des shots</span>
+          </label>
+          <label class="play-q10-validated-option">
+            <input type="radio" name="validated" value="no" required>
+            <span>Non — rien ne change</span>
+          </label>
+        </div>
+      </fieldset>
+      <button type="submit" class="play-btn play-btn-mode play-q10-continue">Valider</button>
+    </form>
+  </div>
+</div>

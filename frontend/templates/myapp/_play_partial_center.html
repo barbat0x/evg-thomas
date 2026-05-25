@@ -1,0 +1,8 @@
+{% if messages %}
+<ul class="play-messages">
+  {% for message in messages %}
+  <li class="play-msg play-msg-{{ message.tags }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% include 'myapp/_play_center.html' %}

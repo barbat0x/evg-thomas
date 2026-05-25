@@ -1,5 +1,6 @@
 <div
   class="play-column play-column--{{ side }}{% if current_team and current_team.pk == team.pk %} play-column--active-turn{% endif %}"
+  data-play-column="{{ side }}"
   {% if current_team and current_team.pk == team.pk %}aria-current="true"{% endif %}
 >
   <div class="play-column-progress" role="status">
@@ -51,9 +52,11 @@
       </p>
     {% endif %}
   </div>
-  {% if current_team and current_team.pk == team.pk %}
-    <p class="play-column-turn-badge{% if side == 'b' %} play-column-turn-badge--b{% endif %}" aria-hidden="true">À vous !</p>
-  {% endif %}
+  <div class="play-column-badge-slot" aria-hidden="{% if current_team and current_team.pk == team.pk %}false{% else %}true{% endif %}">
+    {% if current_team and current_team.pk == team.pk %}
+      <p class="play-column-turn-badge{% if side == 'b' %} play-column-turn-badge--b{% endif %}">À vous !</p>
+    {% endif %}
+  </div>
   <div class="play-column__row">
     {% if side == 'a' %}
       {% include 'myapp/_play_team_drink_side.html' with side=side %}

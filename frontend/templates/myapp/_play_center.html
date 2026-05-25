@@ -1,0 +1,60 @@
+<main class="play-center{% if mode %} play-center--has-mode{% endif %}">
+  <p class="play-turn">Répond : <strong>{{ current_team.name }}</strong></p>
+
+  <h1 class="play-question">{{ question.text }}</h1>
+
+  <div class="play-center__actions">
+    {% if play_cash_only %}
+    <p class="play-hint play-hint--cash-only">Questions 11 à 14 : mode Cash uniquement.</p>
+    {% else %}
+    <p class="play-hint">Choisissez le mode de réponse :</p>
+    {% endif %}
+
+    {% if not mode %}
+    <div class="play-modes{% if play_cash_only %} play-modes--cash-only{% endif %}">
+      {% if not play_cash_only %}
+      <form method="post" class="play-mode-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="choose_mode">
+        <input type="hidden" name="mode" value="duo">
+        <button type="submit" class="play-btn play-btn-mode">Duo</button>
+      </form>
+      <form method="post" class="play-mode-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="choose_mode">
+        <input type="hidden" name="mode" value="carre">
+        <button type="submit" class="play-btn play-btn-mode">Carré</button>
+      </form>
+      {% endif %}
+      <form method="post" class="play-mode-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="choose_mode">
+        <input type="hidden" name="mode" value="cash">
+        <button type="submit" class="play-btn play-btn-mode">Cash</button>
+      </form>
+    </div>
+    {% elif mode == 'cash' %}
+    <div class="play-cash-panel">
+      <form method="post" class="play-cash-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="answer">
+        <div class="play-cash-verdict">
+          <button type="submit" name="cash_verdict" value="correct" class="play-btn play-btn-cash-true">Vrai</button>
+          <button type="submit" name="cash_verdict" value="wrong" class="play-btn play-btn-cash-false">Faux</button>
+        </div>
+      </form>
+    </div>
+    {% else %}
+    <div class="play-choices play-choices--{{ mode }}">
+      {% for row in choice_rows %}
+      <form method="post" class="play-choice-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="answer">
+        <input type="hidden" name="choice_index" value="{{ row.index }}">
+        <button type="submit" class="play-btn play-btn-choice">{{ row.text }}</button>
+      </form>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</main>

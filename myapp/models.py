@@ -203,8 +203,8 @@ POINTS_BY_ANSWER_MODE: dict[str, int] = {
 }
 
 DRINK_GORGEES_BY_MODE: dict[str, int] = {
-    AnswerMode.DUO: 1,
-    AnswerMode.CARRE: 2,
+    AnswerMode.DUO: 2,
+    AnswerMode.CARRE: 4,
     AnswerMode.CASH: 0,
 }
 DRINK_SHOTS_BY_MODE: dict[str, int] = {
@@ -463,6 +463,37 @@ class Game(models.Model):
         else:
             raise ValidationError('Équipe inconnue pour cette partie.')
         self.advance_turn()
+
+    def apply_anecdote_shot_split(self, team: Team) -> int:
+        """
+        Moitié des shots Thomas → équipe visée ; Thomas garde le reste.
+        Retourne le nombre de shots transférés.
+        """
+        if not self.pk:
+            raise ValidationError('Partie non enregistrée.')
+        if team.pk not in (self.team_a_id, self.team_b_id):
+            raise ValidationError('Équipe inconnue pour cette partie.')
+        self.refresh_from_db(
+            fields=(
+                'drink_shots_thomas',
+                'drink_shots_team_a',
+                'drink_shots_team_b',
+            ),
+        )
+        n = self.drink_shots_thomas
+        if n <= 0:
+            return 0
+        transfer = n // 2
+        if transfer <= 0:
+            return 0
+        thomas_keeps = n - transfer
+        updates: dict = {'drink_shots_thomas': thomas_keeps}
+        if team.pk == self.team_a_id:
+            updates['drink_shots_team_a'] = F('drink_shots_team_a') + transfer
+        else:
+            updates['drink_shots_team_b'] = F('drink_shots_team_b') + transfer
+        Game.objects.filter(pk=self.pk).update(**updates)
+        return transfer
 
     def finish(self):
         """Termine une partie en cours."""

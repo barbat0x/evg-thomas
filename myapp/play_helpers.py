@@ -142,3 +142,119 @@ def play_drink_template_context(game: Game) -> dict[str, int]:
         'drink_thomas_gorgees': game.drink_gorgees_thomas,
         'drink_thomas_shots': game.drink_shots_thomas,
     }
+
+
+# --- Événement question 10 (mi-manche) ---
+
+Q10_QUESTION_INDEX = 9  # affichage « question 10 » (0-based)
+Q10_CASH_ONLY_FIRST_INDEX = 10  # questions 11–14
+Q10_CASH_ONLY_LAST_INDEX = 13
+
+Q10_BRANCH_CASH = 'cash_forced'
+Q10_BRANCH_ANECDOTE = 'anecdote'
+Q10_BRANCH_NONE = ''
+
+
+def play_q10_branch_session_key(game_id: int) -> str:
+    return f'play_q10_branch_{game_id}'
+
+
+def play_q10_roulette_done_session_key(game_id: int) -> str:
+    return f'play_q10_roulette_done_{game_id}'
+
+
+def play_q10_anecdote_done_session_key(game_id: int) -> str:
+    return f'play_q10_anecdote_done_{game_id}'
+
+
+def total_shots(game: Game) -> int:
+    return (
+        game.drink_shots_thomas
+        + game.drink_shots_team_a
+        + game.drink_shots_team_b
+    )
+
+
+def resolve_q10_branch(game: Game) -> str | None:
+    """Décide l’issue Q10 (None = pas de roulette)."""
+    if total_shots(game) <= 3:
+        return Q10_BRANCH_CASH
+    if game.drink_shots_thomas >= 4:
+        return Q10_BRANCH_ANECDOTE
+    return None
+
+
+def q10_branch_from_session(session, game_id: int) -> str | None:
+    raw = session.get(play_q10_branch_session_key(game_id))
+    if raw in (Q10_BRANCH_CASH, Q10_BRANCH_ANECDOTE):
+        return raw
+    return None
+
+
+def ensure_q10_branch(session, game_id: int, game: Game) -> str | None:
+    key = play_q10_branch_session_key(game_id)
+    if key not in session:
+        session[key] = resolve_q10_branch(game) or Q10_BRANCH_NONE
+        session.modified = True
+    return q10_branch_from_session(session, game_id)
+
+
+def is_cash_only_question(play_question_index: int, branch: str | None) -> bool:
+    if branch != Q10_BRANCH_CASH:
+        return False
+    return Q10_CASH_ONLY_FIRST_INDEX <= play_question_index <= Q10_CASH_ONLY_LAST_INDEX
+
+
+def play_q10_template_context(request, game: Game, game_id: int) -> dict:
+    idx = game.play_question_index
+    ctx: dict = {
+        'play_q10_show_roulette': False,
+        'play_q10_show_anecdote': False,
+        'play_q10_branch': None,
+        'play_q10_roulette_title': '',
+        'play_q10_roulette_detail': '',
+        'play_cash_only': False,
+    }
+    if idx < Q10_QUESTION_INDEX:
+        return ctx
+
+    if idx == Q10_QUESTION_INDEX:
+        branch = ensure_q10_branch(request.session, game_id, game)
+    else:
+        branch = q10_branch_from_session(request.session, game_id)
+
+    if not branch:
+        return ctx
+
+    ctx['play_q10_branch'] = branch
+    ctx['play_cash_only'] = is_cash_only_question(idx, branch)
+
+    roulette_done = request.session.get(play_q10_roulette_done_session_key(game_id))
+    anecdote_done = request.session.get(play_q10_anecdote_done_session_key(game_id))
+
+    if idx == Q10_QUESTION_INDEX and not roulette_done:
+        ctx['play_q10_show_roulette'] = True
+        if branch == Q10_BRANCH_CASH:
+            ctx['play_q10_roulette_title'] = 'Cash forcé !'
+            ctx['play_q10_roulette_detail'] = (
+                'Les questions 11, 12, 13 et 14 se joueront uniquement en mode Cash.'
+            )
+        else:
+            ctx['play_q10_roulette_title'] = 'Anecdote !'
+            ctx['play_q10_roulette_detail'] = (
+                'Thomas raconte une anecdote sur quelqu’un. Si la majorité trouve ça drôle, '
+                'il partage ses shots avec l’équipe de la personne visée.'
+            )
+    elif (
+        idx == Q10_QUESTION_INDEX
+        and branch == Q10_BRANCH_ANECDOTE
+        and roulette_done
+        and not anecdote_done
+    ):
+        ctx['play_q10_show_anecdote'] = True
+
+    return ctx
+
+
+def play_q10_needs_overlay(ctx: dict) -> bool:
+    return bool(ctx.get('play_q10_show_roulette') or ctx.get('play_q10_show_anecdote'))
