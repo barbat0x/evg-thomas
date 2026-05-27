@@ -73,10 +73,10 @@ BUILTIN_QUESTIONS: list[dict[str, object]] = [
         'duo': 3,
     },
     {
-        'text': "Où est-ce qu'il a grandi ?",
-        'choices': ['Bussy', 'Lagny', 'Chanteloup', 'Putteaux'],
-        'correct': 0,
-        'duo': 2,
+        'text': "En quelle année a-t-il déménagé à Puteaux ?",
+        'choices': ['2014', '2015', '2016', '2027'],
+        'correct': 1,
+        'duo': 0,
     },
     {
         'text': "Quel écart d'âge Thomas a-t-il avec son frère ?",
